@@ -56,6 +56,7 @@ class DeviceInfo {
     developer.log('buildDataAndroid", $build');
     return <String, String>{
       'os_name': 'Android ${build.version.release}',
+      'os_version': '${build.version.release}',
       'device_brand': build.brand,
       'device_manufacturer': build.manufacturer,
       'device_model': build.model,
