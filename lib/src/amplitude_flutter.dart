@@ -34,15 +34,16 @@ class AmplitudeFlutter {
   dynamic userId;
 
   /// Set the user id associated with events
-  void setUserId(dynamic userId) {
+  Future<void> setUserId(dynamic userId) async {
     this.userId = userId;
+    session.userId = userId;
   }
 
   /// Log an event
   Future<void> logEvent(
       {@required String name,
       Map<String, dynamic> properties = const <String, String>{}}) async {
-    session.refresh();
+    await session.refresh();
 
     if (config.optOut) {
       return Future.value(null);
