@@ -1,5 +1,7 @@
 package com.amplitude.amplitude_flutter;
 
+import com.amplitude.api.Amplitude;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
