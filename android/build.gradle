@@ -36,4 +36,5 @@ android {
 dependencies {
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.amplitude:android-sdk:2.16.0'
 }

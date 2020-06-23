@@ -145,6 +145,13 @@ public class AmplitudeFlutterPlugin implements FlutterPlugin, ActivityAware, Met
             case "currentLocale":
                 result.success(getCurrentLocale());
                 break;
+	        case "sessionId":
+		        String userId = null;
+		        Map<String, String> args = call.arguments;
+		        if (args.containsKey("userId"))
+			        userId = args.get("userId");
+		        result.success(Amplitude.getInstance(userId));
+		        break;
             case "advertisingId":
                 Thread thread = new Thread(){
                     public void run(){

@@ -1,4 +1,6 @@
+import 'package:amplitude_flutter/src/device_info_helper.dart';
 import 'package:flutter/widgets.dart';
+
 import './time_utils.dart';
 
 class Session with WidgetsBindingObserver {
@@ -30,6 +32,8 @@ class Session with WidgetsBindingObserver {
   int sessionStart;
   int lastActivity;
   bool _inForeground = true;
+  String userId;
+  String nativeSessionId;
 
   void start() {
     sessionStart = _time.currentTime();
@@ -37,15 +41,17 @@ class Session with WidgetsBindingObserver {
   }
 
   String getSessionId() {
-    return sessionStart.toString();
+    return nativeSessionId ?? sessionStart.toString();
   }
 
-  void refresh() {
+  Future<void> refresh() async {
     final int now = _time.currentTime();
     if (!_withinSession(now)) {
       sessionStart = now;
     }
     lastActivity = now;
+
+    nativeSessionId ??= await DeviceInfoHelper.sessionId(userId);
   }
 
   void enterBackground() {
