@@ -9,12 +9,14 @@ import android.os.LocaleList;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.amplitude.api.Amplitude;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -139,6 +141,12 @@ public class AmplitudeFlutterPlugin implements FlutterPlugin, ActivityAware, Met
         break;
       case "currentLocale":
         result.success(getCurrentLocale());
+        break;
+      case "sessionId":
+        String userId = null;
+	    Map<String, String> args = call.arguments;
+	    if(args.containsKey("userId")) userId = args.get("userId");
+	    result.success(Amplitude.getInstance(userId));
         break;
       default:
         result.notImplemented();
