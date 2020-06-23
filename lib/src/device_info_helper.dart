@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/services.dart';
 
 class DeviceInfoHelper {
@@ -34,5 +35,12 @@ class DeviceInfoHelper {
   static Future<String> get currentLocale async {
     final String locale = await _channel.invokeMethod('currentLocale');
     return locale;
+  }
+
+  static Future<String> sessionId(String userId) async {
+    final String sessionId = await _channel.invokeMethod('sessionId', {
+      'userId': userId,
+    });
+    return sessionId;
   }
 }
