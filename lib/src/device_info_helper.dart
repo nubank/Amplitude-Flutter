@@ -38,6 +38,11 @@ class DeviceInfoHelper {
     return sessionId;
   }
 
+  static Future<String> get deviceId async {
+    final String deviceId = await _channel.invokeMethod('deviceId');
+    return deviceId;
+  }
+
   /// Returns a [String] for adverstingId.
   /// iOS: idfa
   /// Android: androidADID

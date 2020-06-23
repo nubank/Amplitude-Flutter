@@ -150,7 +150,14 @@ public class AmplitudeFlutterPlugin implements FlutterPlugin, ActivityAware, Met
 		        Map<String, String> args = call.arguments;
 		        if (args.containsKey("userId"))
 			        userId = args.get("userId");
-		        result.success(Amplitude.getInstance(userId));
+		        result.success(Amplitude.getInstance(userId).getSessionId());
+		        break;
+	        case "deviceId":
+		        String userId = null;
+		        Map<String, String> args = call.arguments;
+		        if (args.containsKey("userId"))
+			        userId = args.get("userId");
+		        result.success(Amplitude.getInstance(userId).getDeviceId());
 		        break;
             case "advertisingId":
                 Thread thread = new Thread(){
