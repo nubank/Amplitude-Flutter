@@ -149,7 +149,7 @@ public class AmplitudeFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 break;
 	        case "sessionId": {
 		        String userId = null;
-		        Map<String, String> args = call.arguments;
+		        Map<String, String> args = (Map< String, String>) call.arguments;
 		        if (args.containsKey("userId"))
 			        userId = args.get("userId");
 		        result.success(Amplitude.getInstance(userId).getSessionId());
@@ -157,7 +157,7 @@ public class AmplitudeFlutterPlugin implements FlutterPlugin, ActivityAware, Met
 		        break;
 	        case "deviceId": {
 		        String userId = null;
-		        Map<String, String> args = call.arguments;
+		        Map<String, String> args = (Map<String, String>) call.arguments;
 		        if (args.containsKey("userId"))
 			        userId = args.get("userId");
 		        result.success(Amplitude.getInstance(userId).getDeviceId());
