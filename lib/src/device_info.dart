@@ -81,17 +81,18 @@ class DeviceInfo {
 
   Future<Map<String, String>> _parseAndroidInfo(AndroidDeviceInfo build) async {
     developer.log('buildDataAndroid", $build');
-    
+
     String deviceId = await MetadataStore().getDeviceId();
 
     // If deviceId is null and invalid, we will use AAID or
     // generate a NEW random number followed by 'R'
     if (deviceId == null || Constants.kInvalidAndroidDeviceIds.contains(deviceId)) {
+      deviceId ??= await DeviceInfoHelper.deviceId;
       deviceId = _advData[Constants.kPayloadAndroidAaid];
       deviceId ??= Uuid().v4() + 'R';
 
       // Persist deviceId locally.
-      MetadataStore().setDeviceId(deviceId);
+      await MetadataStore().setDeviceId(deviceId);
     }
 
     return <String, String>{
