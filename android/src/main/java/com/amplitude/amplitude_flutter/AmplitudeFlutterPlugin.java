@@ -1,7 +1,5 @@
 package com.amplitude.amplitude_flutter;
 
-import com.amplitude.api.Amplitude;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -13,15 +11,17 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import com.amplitude.api.Amplitude;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -147,19 +147,21 @@ public class AmplitudeFlutterPlugin implements FlutterPlugin, ActivityAware, Met
             case "currentLocale":
                 result.success(getCurrentLocale());
                 break;
-	        case "sessionId":
+	        case "sessionId": {
 		        String userId = null;
 		        Map<String, String> args = call.arguments;
 		        if (args.containsKey("userId"))
 			        userId = args.get("userId");
 		        result.success(Amplitude.getInstance(userId).getSessionId());
+	        }
 		        break;
-	        case "deviceId":
+	        case "deviceId": {
 		        String userId = null;
 		        Map<String, String> args = call.arguments;
 		        if (args.containsKey("userId"))
 			        userId = args.get("userId");
 		        result.success(Amplitude.getInstance(userId).getDeviceId());
+	        }
 		        break;
             case "advertisingId":
                 Thread thread = new Thread(){
