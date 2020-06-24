@@ -32,10 +32,10 @@ class DeviceInfoHelper {
   }
 
   static Future<String> sessionId(String userId) async {
-    final String sessionId = await _channel.invokeMethod('sessionId', {
+    final int sessionId = await _channel.invokeMethod('sessionId', {
       'userId': userId,
     });
-    return sessionId;
+    return sessionId?.toString();
   }
 
   static Future<String> get deviceId async {
