@@ -15,6 +15,7 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
+  s.dependency 'Amplitude', :git => 'https://github.com/fpg1503/Amplitude-iOS' :commit => '85e67ae612ebf6c6fa4a79e6b78683b6fd896fd4'
   s.swift_version = '4.0'
   s.ios.deployment_target = '8.0'
 end

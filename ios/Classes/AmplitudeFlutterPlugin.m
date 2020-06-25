@@ -1,4 +1,5 @@
 #import "AmplitudeFlutterPlugin.h"
+#import <Amplitude/Amplitude.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 #import <sys/utsname.h>
@@ -31,6 +32,15 @@
     } else if ([@"deviceModel" isEqualToString:call.method]) {
         NSString *deviceModel = [self deviceModel];
         result(deviceModel);
+    } else if([@"sessionId" isEqualToString:call.method]){
+        NSDictionary *arguments [[NSDictionary] call.arguments];
+        NSString *userId = [arguments objectForKey:@"userId"];
+        long long *sessionId = [[Amplitude instanceWithName:userId] getSessionId];
+        result(sessionId);
+    } else if([@"deviceId" isEqualToString:call.method]){
+        NSString *userId = [arguments objectForKey:@"userId"];
+        NSString *deviceId = [[Amplitude instanceWithName:userId] getDeviceId];
+        result(deviceId);
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -60,7 +70,7 @@
                 SEL advertisingIdentifierSelector = NSSelectorFromString(@"advertisingIdentifier");
                 NSUUID *uuid = ((NSUUID* (*)(id, SEL))[sharedManager methodForSelector:advertisingIdentifierSelector])(sharedManager, advertisingIdentifierSelector);
                 NSString *uuidString = [uuid UUIDString];
-                
+
                 if (uuidString != nil &&
                     // On simulator, it will give you all 0s.
                     ![uuidString isEqualToString:@"00000000-0000-0000-0000-000000000000"]) {
@@ -122,23 +132,23 @@
     if ([platform isEqualToString:@"iPhone10,4"])    return @"iPhone 8";
     if ([platform isEqualToString:@"iPhone10,2"])    return @"iPhone 8 Plus";
     if ([platform isEqualToString:@"iPhone10,5"])    return @"iPhone 8 Plus";
-    
+
     // iPhone X
     if ([platform isEqualToString:@"iPhone10,3"])    return @"iPhone X";
     if ([platform isEqualToString:@"iPhone10,6"])    return @"iPhone X";
-    
+
     // iPhone XS
     if ([platform isEqualToString:@"iPhone11,2"])    return @"iPhone XS";
     if ([platform isEqualToString:@"iPhone11,6"])    return @"iPhone XS Max";
-    
+
     // iPhone XR
     if ([platform isEqualToString:@"iPhone11,8"])    return @"iPhone XR";
-    
+
     // iPhone 11
     if ([platform isEqualToString:@"iPhone12,1"])    return @"iPhone 11";
     if ([platform isEqualToString:@"iPhone12,3"])    return @"iPhone 11 Pro";
     if ([platform isEqualToString:@"iPhone12,5"])    return @"iPhone 11 Pro Max";
-    
+
     // == iPod ==
     if ([platform isEqualToString:@"iPod1,1"])      return @"iPod Touch 1G";
     if ([platform isEqualToString:@"iPod2,1"])      return @"iPod Touch 2G";
@@ -147,7 +157,7 @@
     if ([platform isEqualToString:@"iPod5,1"])      return @"iPod Touch 5G";
     if ([platform isEqualToString:@"iPod7,1"])      return @"iPod Touch 6G";
     if ([platform isEqualToString:@"iPod9,1"])      return @"iPod Touch 7G";
-    
+
     // == iPad ==
     // iPad 1
     if ([platform isEqualToString:@"iPad1,1"])      return @"iPad 1";
@@ -183,7 +193,7 @@
     // iPad 7
     if ([platform isEqualToString:@"iPad7,11"])      return @"iPad 6";
     if ([platform isEqualToString:@"iPad7,12"])      return @"iPad 6";
-    
+
     // iPad Pro
     if ([platform isEqualToString:@"iPad6,7"])      return @"iPad Pro";
     if ([platform isEqualToString:@"iPad6,8"])      return @"iPad Pro";
@@ -201,7 +211,7 @@
     if ([platform isEqualToString:@"iPad8,6"])      return @"iPad Pro";
     if ([platform isEqualToString:@"iPad8,7"])      return @"iPad Pro";
     if ([platform isEqualToString:@"iPad8,8"])      return @"iPad Pro";
-    
+
     // iPad Mini
     if ([platform isEqualToString:@"iPad2,5"])      return @"iPad Mini";
     if ([platform isEqualToString:@"iPad2,6"])      return @"iPad Mini";
@@ -220,7 +230,7 @@
     // iPad Mini 5
     if ([platform isEqualToString:@"iPad11,1"])      return @"iPad Mini 5";
     if ([platform isEqualToString:@"iPad11,2"])      return @"iPad Mini 5";
-    
+
     // == Others ==
     if ([platform isEqualToString:@"i386"])         return @"Simulator";
     if ([platform isEqualToString:@"x86_64"])       return @"Simulator";
