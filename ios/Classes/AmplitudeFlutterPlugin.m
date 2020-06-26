@@ -1,5 +1,4 @@
 #import "AmplitudeFlutterPlugin.h"
-#import <Amplitude/Amplitude.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 #import <sys/utsname.h>
