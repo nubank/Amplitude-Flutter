@@ -33,6 +33,10 @@ class AmplitudeFlutter {
   EventBuffer buffer;
   dynamic userId;
 
+  void setSessionId(int sessionId) {
+    session.sessionStart = sessionId;
+  }
+
   /// Set the user id associated with events
   void setUserId(dynamic userId) {
     this.userId = userId;
@@ -42,19 +46,17 @@ class AmplitudeFlutter {
   Future<void> logEvent(
       {@required String name,
       Map<String, dynamic> properties = const <String, String>{}}) async {
-    session.refresh();
-
     if (config.optOut) {
       return Future.value(null);
     }
 
-    final Event event = Event(name, sessionId: session.getSessionId(), props: properties);
+    final Event event =
+        Event(name, sessionId: session.getSessionId(), props: properties);
 
-    final Map<String, String> advertisingValues = await deviceInfo.getAdvertisingInfo();
+    final Map<String, String> advertisingValues =
+        await deviceInfo.getAdvertisingInfo();
     if (advertisingValues != null) {
-      event.addProps(<String, dynamic>{
-        'api_properties': advertisingValues
-      });
+      event.addProps(<String, dynamic>{'api_properties': advertisingValues});
     }
     event.addProps(await deviceInfo.getPlatformInfo());
 
