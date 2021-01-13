@@ -1,8 +1,10 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '10.0'
+platform :ios, '9.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+pod 'Amplitude', :git => 'https://github.com/nubank/Amplitude-iOS.git', :commit => '14de46058a624377cbc30295ac5e1763ae3f8a8e'
 
 project 'Runner', {
   'Debug' => :debug,

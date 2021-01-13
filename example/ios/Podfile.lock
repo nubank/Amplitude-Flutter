@@ -6,24 +6,29 @@ PODS:
   - Flutter (1.0.0)
 
 DEPENDENCIES:
+  - Amplitude (from `https://github.com/nubank/Amplitude-iOS.git`, commit `14de46058a624377cbc30295ac5e1763ae3f8a8e`)
   - amplitude_flutter (from `.symlinks/plugins/amplitude_flutter/ios`)
   - Flutter (from `Flutter`)
 
-SPEC REPOS:
-  trunk:
-    - Amplitude
-
 EXTERNAL SOURCES:
+  Amplitude:
+    :commit: 14de46058a624377cbc30295ac5e1763ae3f8a8e
+    :git: https://github.com/nubank/Amplitude-iOS.git
   amplitude_flutter:
     :path: ".symlinks/plugins/amplitude_flutter/ios"
   Flutter:
     :path: Flutter
 
+CHECKOUT OPTIONS:
+  Amplitude:
+    :commit: 14de46058a624377cbc30295ac5e1763ae3f8a8e
+    :git: https://github.com/nubank/Amplitude-iOS.git
+
 SPEC CHECKSUMS:
-  Amplitude: c948c6f99c7f798c196523b2a5584367401d910f
-  amplitude_flutter: 5c934cf8331619b62bbd5a69f3cfea9090b3ca94
+  Amplitude: f35c340a2d0ae74d7e22d61d1f41d20f63d1008d
+  amplitude_flutter: 849ef9b94fe144bf20591d6d163d2094e2e0dee3
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: c339a0822fb06573e1240b6708f49ff2c0b14383
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.10.0
