@@ -16,7 +16,7 @@ dependencies:
   path: "^1.6.4"
   shared_preferences: "^0.5.6+2"
   sqflite: "^1.1.5"
-  uuid: "^2.0.1"
+  uuid: "^3.0.4"
 dev_dependencies:
   flutter_test:
     sdk: flutter
