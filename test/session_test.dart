@@ -26,7 +26,6 @@ void main() {
 
     when(time.currentTime()).thenAnswer((_) => activeTime);
 
-    session.refresh();
     expect(session.getSessionId(), initialSessionId.toString());
   });
 
@@ -58,6 +57,6 @@ void main() {
     session.didChangeAppLifecycleState(AppLifecycleState.inactive);
     session.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
-    expect(session.getSessionId(), expiredTime.toString());
+    expect(session.getSessionId(), initialSessionId.toString());
   });
 }

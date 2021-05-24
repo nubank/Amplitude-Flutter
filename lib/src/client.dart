@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:http/http.dart' as http;
 
@@ -28,7 +29,8 @@ class Client {
     final String md5 = crypto.md5.convert(utf8.encode(checksum)).toString();
 
     try {
-      final response = await http.post(apiUrl, body: <String, String>{
+      final response =
+          await http.post(Uri.parse(apiUrl), body: <String, String>{
         'client': apiKey,
         'e': events,
         'v': apiVersion,
