@@ -1,6 +1,6 @@
 class Constants {
   static const packageName = 'amplitude-flutter';
-  static const packageVersion = '1.3.0';
+  static const packageVersion = '1.4.0';
 
   // Local storage
   static const kLocalStoreDeviceIdKey = 'amp:device_id';
@@ -13,4 +13,7 @@ class Constants {
   static const kPayloadAndroidAaid = 'androidADID';
   static const kPayloadIosIdfa = 'ios_idfa';
   static const kPayloadIosIdfv = 'ios_idfv';
+
+  static const kSessionStartEvent = 'session_start';
+  static const kSessionEndEvent = 'session_end';
 }

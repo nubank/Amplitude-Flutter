@@ -39,6 +39,22 @@ class Session with WidgetsBindingObserver {
     return sessionStart.toString();
   }
 
+  void refresh() {
+    final int now = _time.currentTime();
+    if (!withinSession(now)) {
+      sessionStart = now;
+    }
+    lastActivity = now;
+  }
+
+  void enterBackground() {
+    _inForeground = false;
+  }
+
+  void exitBackground() {
+    _inForeground = true;
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
@@ -50,5 +66,12 @@ class Session with WidgetsBindingObserver {
         break;
       default:
     }
+  }
+
+  bool withinSession(int timestamp) {
+    if (lastActivity != null && !_inForeground) {
+      return (timestamp - lastActivity) < timeout;
+    }
+    return true;
   }
 }
