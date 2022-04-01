@@ -41,7 +41,14 @@ class DeviceInfo {
   }
 
   Future<Map<String, String>> getAdvertisingInfo() async {
-    if (_advData.isNotEmpty) {
+
+    return <String, String>{};
+
+    // We are removing this block because since April 1 2022 it started crashing
+    // on some Android Devices when it was trying to get the advertisingId
+    // We need to keep it commented until to be able to bump Amplitude
+
+    /*if (_advData.isNotEmpty) {
       return _advData;
     }
 
@@ -62,7 +69,7 @@ class DeviceInfo {
       _advData = <String, String>{};
     }
 
-    return _advData;
+    return _advData; */
   }
 
   Future<Map<String, String>> _getCarrierName() async {
