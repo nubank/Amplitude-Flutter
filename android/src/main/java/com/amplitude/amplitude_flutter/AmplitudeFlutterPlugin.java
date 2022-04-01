@@ -146,29 +146,7 @@ public class AmplitudeFlutterPlugin implements FlutterPlugin, ActivityAware, Met
                 result.success(getCurrentLocale());
                 break;
             case "advertisingId":
-                Thread thread = new Thread(){
-                    public void run(){
-                        try {
-                            final String advId = getAdvertisingId();
-                            mActivity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    result.success(advId);
-                                }
-                            });
-                        } catch (Exception e) {
-                            mActivity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    result.success(null);
-                                }
-                            });
-                        }
-                    }
-                };
-
-                thread.start();
-
+                result.success(null);
                 break;
             default:
                 result.notImplemented();
