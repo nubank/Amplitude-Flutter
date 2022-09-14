@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
+import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:uuid/uuid.dart';
 
@@ -23,9 +24,9 @@ class DeviceInfo {
 
     Map<String, String> deviceData;
     try {
-      if (Platform.isAndroid) {
+      if (defaultTargetPlatform == TargetPlatform.android) {
         deviceData = await _parseAndroidInfo(await deviceInfoPlugin.androidInfo);
-      } else if (Platform.isIOS) {
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         deviceData = await _parseIosInfo(await deviceInfoPlugin.iosInfo);
       }
       deviceData.addAll(await _getApplicationInfo());
@@ -84,6 +85,11 @@ class DeviceInfo {
   Future<Map<String, String>> _getCurrentLocale() async {
     final String name = await DeviceInfoHelper.currentLocale;
     return <String, String>{'language': name};
+  }
+
+  Future<void> regenerateDeviceId() async {
+    await MetadataStore().setDeviceId(Uuid().v4() + 'R');
+    _deviceData = {};
   }
 
   Future<Map<String, String>> _parseAndroidInfo(AndroidDeviceInfo build) async {
