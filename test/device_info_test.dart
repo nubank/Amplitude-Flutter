@@ -42,8 +42,8 @@ void main() {
           ));
 
       final deviceId = platformInfo['device_id'];
-      
-       await deviceInfo.regenerateDeviceId();
+
+      await deviceInfo.regenerateDeviceId();
 
       final newPlatformInfo = await deviceInfo.getPlatformInfo();
       final newDeviceId = newPlatformInfo['device_id'];
@@ -54,7 +54,6 @@ void main() {
       final savedDeviceId = prefs.getString(Constants.kLocalStoreDeviceIdKey);
 
       expect(savedDeviceId, equals(newDeviceId));
-      
     });
   });
 }
