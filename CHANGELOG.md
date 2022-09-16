@@ -1,3 +1,6 @@
+## 1.3.1
+* Include `regenerateDeviceId` function
+
 ## 1.3.0
 * Give user the abilities to customize the DB store. Thanks @reinaldomoreira!
 
