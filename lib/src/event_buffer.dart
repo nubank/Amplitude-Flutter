@@ -62,6 +62,7 @@ class EventBuffer {
     final status = await client.post(payload);
     switch (status) {
       case 200:
+      case 201:
         await _deleteEvents(eventIds);
         break;
       case 413:
