@@ -146,6 +146,15 @@ void main() {
         verify(mockStore.delete([1, 2, 3])).called(1);
       });
 
+      test('deletes events on accepted', () async {
+        when(mockClient.post(any)).thenAnswer((_) => Future.value(202));
+
+        await subject.flush();
+
+        verify(mockClient.post(any)).called(1);
+        verify(mockStore.delete([1, 2, 3])).called(1);
+      });
+
       test('does not delete events on failure', () async {
         when(mockClient.post(any)).thenAnswer((_) => Future.value(400));
 
