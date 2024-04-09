@@ -41,7 +41,7 @@ class EventBuffer {
     event.timestamp = TimeUtils().currentTime();
     await store.add(event);
 
-    if (length >= config.bufferSize) {
+    if (length >= config.bufferSize && numEvents == null) {
       await flush();
     }
   }
