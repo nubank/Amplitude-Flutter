@@ -1,3 +1,7 @@
+## 1.3.2
+* Don't try to flush on each new event when the `numEvents` is not null, this prevents from keep retrying too soon
+when the buffer is too large.
+
 ## 1.3.1
 * Include `regenerateDeviceId` function
 
