@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-
 import 'config.dart';
 import 'device_info.dart';
 import 'event.dart';
@@ -16,8 +14,8 @@ class AmplitudeFlutter {
     config ??= Config();
     provider = ServiceProvider(
         apiKey: apiKey,
-        timeout: config.sessionTimeout,
-        getCarrierInfo: config.getCarrierInfo);
+        timeout: config!.sessionTimeout,
+        getCarrierInfo: config!.getCarrierInfo);
     _init();
   }
 
@@ -25,16 +23,16 @@ class AmplitudeFlutter {
     _init();
   }
 
-  bool getCarrierInfo;
-  Config config;
-  ServiceProvider provider;
-  DeviceInfo deviceInfo;
-  Session session;
-  EventBuffer buffer;
+  bool? getCarrierInfo;
+  Config? config;
+  ServiceProvider? provider;
+  DeviceInfo? deviceInfo;
+  Session? session;
+  EventBuffer? buffer;
   dynamic userId;
 
   void setSessionId(int sessionId) {
-    session.sessionStart = sessionId;
+    session!.sessionStart = sessionId;
   }
 
   /// Set the user id associated with events
@@ -44,27 +42,27 @@ class AmplitudeFlutter {
 
   /// Log an event
   Future<void> logEvent(
-      {@required String name,
+      {required String name,
       Map<String, dynamic> properties = const <String, String>{}}) async {
-    if (config.optOut) {
+    if (config!.optOut) {
       return Future.value(null);
     }
 
     final Event event =
-        Event(name, sessionId: session.getSessionId(), props: properties);
+        Event(name, sessionId: session!.getSessionId(), props: properties);
 
-    final Map<String, String> advertisingValues =
-        await deviceInfo.getAdvertisingInfo();
+    final Map<String, String>? advertisingValues =
+        await deviceInfo?.getAdvertisingInfo();
     if (advertisingValues != null) {
       event.addProps(<String, dynamic>{'api_properties': advertisingValues});
     }
-    event.addProps(await deviceInfo.getPlatformInfo());
+    event.addProps(await deviceInfo!.getPlatformInfo());
 
     if (userId != null) {
       event.addProp('user_id', userId);
     }
 
-    return buffer.add(event);
+    return buffer!.add(event);
   }
 
   /// Identify the current user
@@ -103,13 +101,13 @@ class AmplitudeFlutter {
   }
 
   /// Manually flush events in the buffer
-  Future<void> flushEvents() => buffer.flush();
+  Future<void> flushEvents() => buffer!.flush();
 
   void _init() {
-    deviceInfo = provider.deviceInfo;
-    session = provider.session;
-    buffer = EventBuffer(provider, config);
+    deviceInfo = provider!.deviceInfo;
+    session = provider!.session;
+    buffer = EventBuffer(provider!, config!);
 
-    session.start();
+    session!.start();
   }
 }

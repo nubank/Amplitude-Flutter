@@ -3,7 +3,7 @@ class Revenue {
     payload = <String, dynamic>{QUANTITY: 1};
   }
 
-  Map<String, dynamic> payload;
+  late Map<String, dynamic> payload;
 
   static const EVENT = 'revenue_amount';
   static const PRODUCT_ID = r'$productId';

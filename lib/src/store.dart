@@ -22,7 +22,7 @@ class Store {
   }
 
   static final Map<String, Store> _instances = {};
-  Database _db;
+  Database? _db;
   final String dbFile;
   int length = 0;
 
@@ -73,12 +73,12 @@ class Store {
     final db = await _openDb();
     length = await _count(db);
     _db = db;
-    return _db;
+    return _db!;
   }
 
   Future<Database> _getDb() async {
     if (_db != null) {
-      return _db;
+      return _db!;
     }
     return await _init();
   }

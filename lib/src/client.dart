@@ -8,17 +8,17 @@ import 'time_utils.dart';
 class Client {
   factory Client(String apiKey) {
     if (_instance != null) {
-      return _instance;
+      return _instance!;
     }
     _instance = Client._internal(apiKey);
-    return _instance;
+    return _instance!;
   }
 
   Client._internal(this.apiKey);
 
   static const String apiUrl = 'https://api.amplitude.com/';
   static const String apiVersion = '2';
-  static Client _instance;
+  static Client? _instance;
 
   final String apiKey;
 

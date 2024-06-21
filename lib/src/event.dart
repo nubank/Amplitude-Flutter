@@ -4,19 +4,19 @@ import 'constants.dart';
 
 class Event {
   Event(this.name,
-      {this.sessionId, this.timestamp, this.id, Map<String, dynamic> props}) {
+      {this.sessionId, this.timestamp, this.id, Map<String, dynamic>? props}) {
     addProps(props);
-    uuid = Uuid().v4();
+    uuid = const Uuid().v4();
   }
 
-  int id;
-  String sessionId;
-  int timestamp;
-  String name;
-  Map<String, dynamic> props = <String, dynamic>{};
-  String uuid;
+  final int? id;
+  final String? sessionId;
+  late final int? timestamp;
+  final String name;
+  final Map<String, dynamic> props = <String, dynamic>{};
+  late String uuid;
 
-  void addProps(Map<String, dynamic> props) {
+  void addProps(Map<String, dynamic>? props) {
     if (props != null) {
       this.props.addAll(props);
     }

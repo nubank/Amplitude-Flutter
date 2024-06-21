@@ -11,7 +11,7 @@ class Identify {
   static const String OP_APPEND = r'$append';
   static const String OP_UNSET = r'$unset';
 
-  Map<String, dynamic> payload;
+  late Map<String, dynamic> payload;
 
   void set(String key, dynamic value) {
     addOp(OP_SET, key, value);
