@@ -92,8 +92,6 @@ class EventBuffer {
 
   Future<void> _deleteEvents(List<int> eventIds) async {
     await store.delete(eventIds);
-    if (numEvents >= length) {
-      numEvents = null;
-    }
+    numEvents = null;
   }
 }
