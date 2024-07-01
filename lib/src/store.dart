@@ -50,6 +50,16 @@ class Store {
     return _count(db);
   }
 
+  Future<void> drop(int count) async {
+    final db = await _getDb();
+    if (db == null) {
+      return;
+    }
+    final resultCount = await db.rawDelete(
+        'DELETE FROM $EVENTS_TABLE WHERE $COL_ID IN (SELECT T2.$COL_ID FROM $EVENTS_TABLE T2 ORDER BY T2.$COL_ID LIMIT $count)');
+    length -= resultCount;
+  }
+
   Future<void> delete(List<int> eventIds) async {
     final db = await _getDb();
     if (db == null) {

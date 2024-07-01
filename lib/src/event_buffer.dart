@@ -34,14 +34,14 @@ class EventBuffer {
   /// Adds a raw event hash to the buffer
   Future<void> add(Event event) async {
     if (length >= config.maxStoredEvents) {
-      print('Max stored events reached.  Discarding event.');
-      return;
+      print('Max stored events reached.  Drop first event');
+      await store.drop(1);
     }
 
     event.timestamp = TimeUtils().currentTime();
     await store.add(event);
 
-    if (length >= config.bufferSize && numEvents == null) {
+    if (length >= config.bufferSize) {
       await flush();
     }
   }
