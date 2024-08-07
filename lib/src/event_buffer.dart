@@ -46,6 +46,26 @@ class EventBuffer {
     }
   }
 
+  /// Adds many raw event hash to the buffer
+  Future<void> addAll(List<Event> eventsList) {
+    if (eventsList.isEmpty) {
+      return Future.value(null);
+    }
+
+    if (length + eventsList.length >= config.maxStoredEvents) {
+      final dropCount = length + eventsList.length - config.maxStoredEvents;
+      print('Max stored events reached.  Drop first $dropCount events');
+      store.drop(dropCount);
+    }
+
+    final events = eventsList.map((e) {
+      e.timestamp = TimeUtils().currentTime();
+      return e;
+    }).toList();
+
+    return store.addAll(events);
+  }
+
   /// Flushes all events in buffer
   Future<void> flush() async {
     if (length < 1 || flushInProgress) {

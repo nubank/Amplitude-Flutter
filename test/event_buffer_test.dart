@@ -85,6 +85,53 @@ void main() {
       });
     });
 
+    group('.addAll', () {
+      test('adds many events to the store, and adds a timestamp property',
+          () async {
+        await subject.addAll([
+          Event('event 1'),
+          Event('event 2'),
+          Event('event 3'),
+        ]);
+        expect(subject.length, equals(3));
+
+        final List<Event> events = await subject.fetch(3);
+
+        for (final Event event in events) {
+          expect(event.timestamp, isInstanceOf<int>());
+        }
+      });
+
+      test('limits number of events added to the store', () async {
+        // Have the client return an unhandled status code so the store doesn't get cleared
+        provider.client = MockClient(httpStatus: 218);
+        subject = EventBuffer(
+            provider,
+            Config(
+              bufferSize: 1,
+              maxStoredEvents: 3,
+            ));
+
+        await subject.addAll([
+          Event('test 1'),
+          Event('test 2'),
+        ]);
+        expect(subject.length, equals(2));
+
+        await subject.addAll([
+          Event('test 3'),
+          Event('test 4'),
+        ]);
+        expect(subject.length, equals(3));
+
+        await subject.addAll([
+          Event('test 5'),
+          Event('test 6'),
+        ]);
+        expect(subject.length, equals(3));
+      });
+    });
+
     group('.fetch', () {
       test('returns a specified number of the oldest events in the store',
           () async {
