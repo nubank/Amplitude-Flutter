@@ -67,6 +67,32 @@ class AmplitudeFlutter {
     return buffer.add(event);
   }
 
+  /// Log many events
+  Future<void> logBulkEvent(List<Map<String, dynamic>> events) async {
+    if (config.optOut) {
+      return Future.value(null);
+    }
+
+    final List<Event> eventsList = events
+        .map((Map<String, dynamic> event) =>
+            Event(event['name'], sessionId: session.getSessionId(), props: event['properties']),)
+        .toList();
+
+    final Map<String, String> advertisingValues = await deviceInfo.getAdvertisingInfo();
+    final platformInfo = await deviceInfo.getPlatformInfo();
+    
+    for(final Event event in eventsList){
+      if (advertisingValues != null) {
+        event.addProps(<String, dynamic>{'api_properties': advertisingValues});
+      }
+      event.addProps(platformInfo);
+      if (userId != null) {
+        event.addProp('user_id', userId);
+      }
+    }
+    return buffer.addAll(eventsList);
+  }
+
   /// Identify the current user
   Future<void> identify(Identify identify,
       {Map<String, dynamic> properties = const <String, dynamic>{}}) async {

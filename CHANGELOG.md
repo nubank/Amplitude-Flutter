@@ -1,3 +1,6 @@
+## 1.3.5
+* Added 'addAll' method in 'Store' class to perform batch save on buffer.
+
 ## 1.3.4
 * Remove older events when the buffer is full
 

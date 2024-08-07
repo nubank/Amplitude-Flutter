@@ -40,4 +40,21 @@ class MockStore implements Store {
 
   @override
   String get dbFile => 'amp.db';
+  
+  @override
+  Future<List<Object>> addAll(List<Event> events) {
+    for (final Event event in events) {
+      event.id = ++curId;
+      db.add(event);
+      length++;
+    }
+    return Future.value(events);
+  }
+  
+  @override
+  Future<void> drop(int count) {
+    db.removeRange(0, count);
+    length -= count;
+    return Future.value(null);
+  }
 }

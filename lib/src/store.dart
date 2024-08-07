@@ -36,6 +36,19 @@ class Store {
     return result;
   }
 
+  Future<List<Object>> addAll(List<Event> events) async {
+    final db = await _getDb();
+    if (db == null) {
+      return [];
+    }
+    final batch = db.batch();
+    for (final event in events){
+      batch.insert(EVENTS_TABLE, _serialize(event));
+      length++;
+    }
+    return await batch.commit(noResult: true);
+  }
+
   Future<void> empty() async {
     final db = await _getDb();
     if (db == null) {

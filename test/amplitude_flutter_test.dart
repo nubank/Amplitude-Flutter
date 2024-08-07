@@ -1,5 +1,4 @@
 import 'package:amplitude_flutter/amplitude_flutter.dart';
-import 'package:amplitude_flutter/src/config.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
@@ -41,6 +40,44 @@ void main() {
           'session_id': '123',
           'platform': 'iOS',
           'timestamp': isInstanceOf<int>()
+        }));
+  });
+
+  test('logBulkEvent', () async {
+    final List<Map<String, dynamic>> events = [
+      {
+        'name': 'test1',
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'properties': {'property-1': 'value-1', 'property-2': 'value-2'},
+      },
+      {
+        'name': 'test2',
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'properties': {'property-3': 'value-3', 'property-4': 'value-4'},
+      }
+    ];
+
+    await amplitude.logBulkEvent(events);
+    await amplitude.flushEvents();
+
+    expect(2, client.postCalls.single.length);
+
+    expect(client.postCalls.single[0], ContainsSubMap(<String, dynamic>{
+          'event_type': 'test1',
+          'session_id': '123',
+          'platform': 'iOS',
+          'timestamp': isInstanceOf<int>(),
+          'property-1': 'value-1', 
+          'property-2': 'value-2',
+        }));
+
+    expect(client.postCalls.single[1], ContainsSubMap(<String, dynamic>{
+          'event_type': 'test2',
+          'session_id': '123',
+          'platform': 'iOS',
+          'timestamp': isInstanceOf<int>(),
+          'property-3': 'value-3',
+          'property-4': 'value-4',
         }));
   });
 
