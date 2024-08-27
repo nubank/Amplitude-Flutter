@@ -4,7 +4,7 @@ class MockClient implements Client {
   MockClient({this.httpStatus: 200});
 
   @override
-  String apiKey;
+  String? apiKey;
   int httpStatus;
 
   final List<dynamic> postCalls = <dynamic>[];

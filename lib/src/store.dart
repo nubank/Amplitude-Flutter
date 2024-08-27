@@ -22,9 +22,9 @@ class Store {
   }
 
   static final Map<String, Store> _instances = {};
-  Database _db;
+  Database? _db;
   final String dbFile;
-  int length = 0;
+  int? length = 0;
 
   Future<int> add(Event event) async {
     final db = await _getDb();
@@ -36,7 +36,7 @@ class Store {
     return result;
   }
 
-  Future<List<Object>> addAll(List<Event> events) async {
+  Future<List<Object?>> addAll(List<Event> events) async {
     final db = await _getDb();
     if (db == null) {
       return [];
@@ -58,7 +58,7 @@ class Store {
     length = 0;
   }
 
-  Future<int> count() async {
+  Future<int?> count() async {
     final db = await _getDb();
     return _count(db);
   }
@@ -73,7 +73,7 @@ class Store {
     length -= resultCount;
   }
 
-  Future<void> delete(List<int> eventIds) async {
+  Future<void> delete(List<int?> eventIds) async {
     final db = await _getDb();
     if (db == null) {
       return;
@@ -92,14 +92,14 @@ class Store {
     return records.map((m) => _deserialize(m)).toList();
   }
 
-  Future<Database> _init() async {
+  Future<Database?> _init() async {
     final db = await _openDb();
     length = await _count(db);
     _db = db;
     return _db;
   }
 
-  Future<Database> _getDb() async {
+  Future<Database?> _getDb() async {
     if (_db != null) {
       return _db;
     }
@@ -129,13 +129,13 @@ class Store {
     }
   }
 
-  Future<int> _count(Database db) async {
+  Future<int?> _count(Database? db) async {
     if (db == null) {
       return 0;
     }
     final List<Map<String, dynamic>> rows =
         await db.rawQuery('SELECT COUNT(*) as count FROM $EVENTS_TABLE');
-    final int count = rows.single['count'];
+    final int? count = rows.single['count'];
     return count;
   }
 

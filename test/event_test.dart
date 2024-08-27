@@ -5,7 +5,7 @@ import 'matchers.dart';
 
 void main() {
   group('Event', () {
-    Event subject;
+    late Event subject;
 
     setUp(() {
       subject = Event('Event Unit Test');

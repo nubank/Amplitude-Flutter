@@ -11,7 +11,7 @@ class Identify {
   static const String OP_APPEND = r'$append';
   static const String OP_UNSET = r'$unset';
 
-  Map<String, dynamic> payload;
+  Map<String, dynamic>? payload;
 
   void set(String key, dynamic value) {
     addOp(OP_SET, key, value);
@@ -41,6 +41,6 @@ class Identify {
   }
 
   Map<String, dynamic> _opMap(String key) {
-    return payload.putIfAbsent(key, () => <String, dynamic>{});
+    return payload!.putIfAbsent(key, () => <String, dynamic>{});
   }
 }

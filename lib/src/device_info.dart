@@ -14,22 +14,22 @@ class DeviceInfo {
   DeviceInfo(this.getCarrierInfo);
   bool getCarrierInfo;
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-  Map<String, String> _deviceData = <String, String>{};
+  Map<String, String?>? _deviceData = <String, String>{};
   Map<String, String> _advData = <String, String>{};
 
-  Future<Map<String, String>> getPlatformInfo() async {
-    if (_deviceData.isNotEmpty) {
+  Future<Map<String, String?>?> getPlatformInfo() async {
+    if (_deviceData!.isNotEmpty) {
       return _deviceData;
     }
 
-    Map<String, String> deviceData;
+    Map<String, String?>? deviceData;
     try {
       if (defaultTargetPlatform == TargetPlatform.android) {
         deviceData = await _parseAndroidInfo(await deviceInfoPlugin.androidInfo);
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         deviceData = await _parseIosInfo(await deviceInfoPlugin.iosInfo);
       }
-      deviceData.addAll(await _getApplicationInfo());
+      deviceData!.addAll(await _getApplicationInfo());
       deviceData.addAll(await _getCurrentLocale());
       if (getCarrierInfo == true) {
         deviceData.addAll(await _getCarrierName());
@@ -74,7 +74,7 @@ class DeviceInfo {
   }
 
   Future<Map<String, String>> _getCarrierName() async {
-    final String name = await DeviceInfoHelper.getCarrierName;
+    final String? name = await DeviceInfoHelper.getCarrierName;
     if (name != null && name.isNotEmpty) {
       return <String, String>{'carrier': name};
     } else {
@@ -82,9 +82,9 @@ class DeviceInfo {
     }
   }
 
-  Future<Map<String, String>> _getCurrentLocale() async {
-    final String name = await DeviceInfoHelper.currentLocale;
-    return <String, String>{'language': name};
+  Future<Map<String, String?>> _getCurrentLocale() async {
+    final String? name = await DeviceInfoHelper.currentLocale;
+    return <String, String?>{'language': name};
   }
 
   Future<void> regenerateDeviceId() async {
@@ -92,10 +92,10 @@ class DeviceInfo {
     _deviceData = {};
   }
 
-  Future<Map<String, String>> _parseAndroidInfo(AndroidDeviceInfo build) async {
+  Future<Map<String, String?>> _parseAndroidInfo(AndroidDeviceInfo build) async {
     developer.log('buildDataAndroid", $build');
     
-    String deviceId = await MetadataStore().getDeviceId();
+    String? deviceId = await MetadataStore().getDeviceId();
 
     // If deviceId is null and invalid, we will use AAID or
     // generate a NEW random number followed by 'R'
@@ -107,7 +107,7 @@ class DeviceInfo {
       MetadataStore().setDeviceId(deviceId);
     }
 
-    return <String, String>{
+    return <String, String?>{
       'os_name': 'android',
       'os_version': build.version.release,
       'device_brand': build.brand,
@@ -118,10 +118,10 @@ class DeviceInfo {
     };
   }
 
-  Future<Map<String, String>> _parseIosInfo(IosDeviceInfo data) async {
+  Future<Map<String, String?>> _parseIosInfo(IosDeviceInfo data) async {
     developer.log('buildDataIos", $data');
 
-    String deviceId = await MetadataStore().getDeviceId();
+    String? deviceId = await MetadataStore().getDeviceId();
 
     // If deviceId is null and invalid, we will use idfa or
     // generate a NEW random number followed by 'R'
@@ -133,8 +133,8 @@ class DeviceInfo {
       MetadataStore().setDeviceId(deviceId);
     }
 
-    final String deviceModel = await DeviceInfoHelper.deviceModel;
-    return <String, String>{
+    final String? deviceModel = await DeviceInfoHelper.deviceModel;
+    return <String, String?>{
       'os_name': data.systemName,
       'os_version': data.systemVersion,
       'device_brand': null,

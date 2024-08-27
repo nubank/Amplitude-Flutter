@@ -20,11 +20,11 @@ class MockServiceProvider implements ServiceProvider {
   }
 
   @override
-  Client client;
+  Client? client;
   @override
-  Store store;
+  Store? store;
   @override
-  Session session;
+  Session? session;
   @override
-  DeviceInfo deviceInfo;
+  DeviceInfo? deviceInfo;
 }

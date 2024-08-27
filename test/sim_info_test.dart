@@ -26,7 +26,7 @@ void main() {
   });
 
   test('amplitude_flutter channel is setup with carrierName method', () async {
-    final String name = await DeviceInfoHelper.getCarrierName;
+    final String? name = await DeviceInfoHelper.getCarrierName;
     expect(name, equals('AT&T'));
   });
 }

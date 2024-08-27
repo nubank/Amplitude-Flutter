@@ -5,10 +5,10 @@ import './time_utils.dart';
 class Session with WidgetsBindingObserver {
   factory Session(int timeout) {
     if (_instance != null) {
-      return _instance;
+      return _instance!;
     }
     _instance = Session._internal(timeout);
-    return _instance;
+    return _instance!;
   }
 
   Session._internal(this.timeout) {
@@ -24,12 +24,12 @@ class Session with WidgetsBindingObserver {
     _time = time;
   }
 
-  static Session _instance;
-  TimeUtils _time;
+  static Session? _instance;
+  late TimeUtils _time;
 
   int timeout;
-  int sessionStart;
-  int lastActivity;
+  int? sessionStart;
+  int? lastActivity;
 
   void start() {
     sessionStart = _time.currentTime();

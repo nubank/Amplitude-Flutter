@@ -21,7 +21,7 @@ class MockDeviceInfoPlatform
 }
 
 void main() {
-  DeviceInfo deviceInfo;
+  late DeviceInfo deviceInfo;
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
@@ -32,7 +32,7 @@ void main() {
   group('#regenerateDeviceId', () {
     test('when platform is Android', () async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      final platformInfo = await deviceInfo.getPlatformInfo();
+      final platformInfo = (await deviceInfo.getPlatformInfo())!;
       expect(
           platformInfo,
           allOf(
@@ -45,7 +45,7 @@ void main() {
 
       await deviceInfo.regenerateDeviceId();
 
-      final newPlatformInfo = await deviceInfo.getPlatformInfo();
+      final newPlatformInfo = (await deviceInfo.getPlatformInfo())!;
       final newDeviceId = newPlatformInfo['device_id'];
 
       expect(newDeviceId, isNot(deviceId));

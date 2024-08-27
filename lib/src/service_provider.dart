@@ -7,9 +7,9 @@ import 'store.dart';
 
 class ServiceProvider {
   ServiceProvider(
-      {@required String apiKey,
-      @required int timeout,
-      @required bool getCarrierInfo,
+      {required String apiKey,
+      required int timeout,
+      required bool getCarrierInfo,
       this.store}) {
     client = Client(apiKey);
     deviceInfo = DeviceInfo(getCarrierInfo);
@@ -17,8 +17,8 @@ class ServiceProvider {
     store ??= Store();
   }
 
-  Client client;
-  Store store;
-  Session session;
-  DeviceInfo deviceInfo;
+  Client? client;
+  Store? store;
+  Session? session;
+  DeviceInfo? deviceInfo;
 }

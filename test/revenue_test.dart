@@ -3,7 +3,7 @@ import 'package:amplitude_flutter/amplitude_flutter.dart';
 
 void main() {
   group('Revenue', () {
-    Revenue subject;
+    late Revenue subject;
 
     setUp(() {
       subject = Revenue();

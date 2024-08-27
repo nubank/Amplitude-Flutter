@@ -7,7 +7,7 @@ import 'package:mockito/mockito.dart';
 class MockTimeUtils extends Mock implements TimeUtils {}
 
 void main() {
-  Session session;
+  late Session session;
   final TimeUtils time = MockTimeUtils();
 
   const int initialSessionId = 1;
