@@ -1,3 +1,4 @@
+// @dart=2.10
 import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -7,24 +8,24 @@ import 'mock_client.dart';
 import 'mock_service_provider.dart';
 
 void main() {
-  late AmplitudeFlutter amplitude;
+  AmplitudeFlutter amplitude;
 
-  MockClient? client;
-  MockDeviceInfo? deviceInfo;
-  MockSession? session;
-  MockServiceProvider? provider;
+  MockClient client;
+  MockDeviceInfo deviceInfo;
+  MockSession session;
+  MockServiceProvider provider;
 
   setUp(() {
     provider = MockServiceProvider();
-    client = provider!.client as MockClient?;
-    deviceInfo = provider!.deviceInfo as MockDeviceInfo?;
-    session = provider!.session as MockSession?;
+    client = provider.client as MockClient;
+    deviceInfo = provider.deviceInfo as MockDeviceInfo;
+    session = provider.session as MockSession;
 
-    when(deviceInfo!.getPlatformInfo()).thenAnswer(
+    when(deviceInfo.getPlatformInfo()).thenAnswer(
         (_) => Future<Map<String, String>>.value({'platform': 'iOS'}));
-    when(session!.getSessionId()).thenAnswer((_) => '123');
+    when(session.getSessionId()).thenAnswer((_) => '123');
 
-    client!.reset();
+    client.reset();
 
     amplitude = AmplitudeFlutter.private(provider, Config());
   });
@@ -34,7 +35,7 @@ void main() {
     await amplitude.flushEvents();
 
     expect(
-        client!.postCalls.single.single,
+        client.postCalls.single.single,
         ContainsSubMap(<String, dynamic>{
           'event_type': 'test',
           'session_id': '123',
@@ -60,9 +61,9 @@ void main() {
     await amplitude.logBulkEvent(events);
     await amplitude.flushEvents();
 
-    expect(2, client!.postCalls.single.length);
+    expect(2, client.postCalls.single.length);
 
-    expect(client!.postCalls.single[0], ContainsSubMap(<String, dynamic>{
+    expect(client.postCalls.single[0], ContainsSubMap(<String, dynamic>{
           'event_type': 'test1',
           'session_id': '123',
           'platform': 'iOS',
@@ -71,7 +72,7 @@ void main() {
           'property-2': 'value-2',
         }));
 
-    expect(client!.postCalls.single[1], ContainsSubMap(<String, dynamic>{
+    expect(client.postCalls.single[1], ContainsSubMap(<String, dynamic>{
           'event_type': 'test2',
           'session_id': '123',
           'platform': 'iOS',
@@ -86,7 +87,7 @@ void main() {
     await amplitude.flushEvents();
 
     expect(
-        client!.postCalls.single.single,
+        client.postCalls.single.single,
         ContainsSubMap(<String, dynamic>{
           'event_type': r'$identify',
           'session_id': '123',
@@ -104,7 +105,7 @@ void main() {
     await amplitude.flushEvents();
 
     expect(
-        client!.postCalls.single.single,
+        client.postCalls.single.single,
         ContainsSubMap(<String, dynamic>{
           'event_type': 'test',
           'session_id': '123',
@@ -120,7 +121,7 @@ void main() {
     await amplitude.flushEvents();
 
     expect(
-        client!.postCalls.single.single,
+        client.postCalls.single.single,
         ContainsSubMap(<String, dynamic>{
           'event_type': r'$groupidentify',
           'session_id': '123',
@@ -138,7 +139,7 @@ void main() {
     await amplitude.flushEvents();
 
     expect(
-        client!.postCalls.single.single,
+        client.postCalls.single.single,
         ContainsSubMap(<String, dynamic>{
           'event_type': r'$identify',
           'session_id': '123',
@@ -164,7 +165,7 @@ void main() {
       await amplitude.flushEvents();
 
       expect(
-          client!.postCalls.single.single,
+          client.postCalls.single.single,
           ContainsSubMap(<String, dynamic>{
             'event_type': 'test',
             'session_id': '123',
@@ -183,7 +184,7 @@ void main() {
     await amplitude.flushEvents();
 
     expect(
-        client!.postCalls.single.single,
+        client.postCalls.single.single,
         ContainsSubMap(<String, dynamic>{
           'event_type': 'revenue_amount',
           'event_properties': {r'$price': 43.43, r'$quantity': 3}
@@ -196,7 +197,7 @@ void main() {
       await amplitude.logEvent(name: 'test');
       await amplitude.flushEvents();
 
-      expect(client!.postCalls, isEmpty);
+      expect(client.postCalls, isEmpty);
     });
   });
 }

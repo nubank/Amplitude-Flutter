@@ -24,7 +24,7 @@ class Store {
   static final Map<String, Store> _instances = {};
   Database? _db;
   final String dbFile;
-  int? length = 0;
+  int length = 0;
 
   Future<int> add(Event event) async {
     final db = await _getDb();
@@ -42,7 +42,7 @@ class Store {
       return [];
     }
     final batch = db.batch();
-    for (final event in events){
+    for (final event in events) {
       batch.insert(EVENTS_TABLE, _serialize(event));
       length++;
     }
@@ -129,14 +129,17 @@ class Store {
     }
   }
 
-  Future<int?> _count(Database? db) async {
+  Future<int> _count(Database? db) async {
     if (db == null) {
       return 0;
     }
-    final List<Map<String, dynamic>> rows =
-        await db.rawQuery('SELECT COUNT(*) as count FROM $EVENTS_TABLE');
-    final int? count = rows.single['count'];
-    return count;
+    try {
+      final List<Map<String, dynamic>> rows =
+          await db.rawQuery('SELECT COUNT(*) as count FROM $EVENTS_TABLE');
+      return rows.single['count'];
+    } catch (e) {
+      return 0;
+    }
   }
 
   Map<String, dynamic> _serialize(Event e) {

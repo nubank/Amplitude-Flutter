@@ -32,7 +32,7 @@ class _RevenueFormState extends State<RevenueForm> {
 
   @override
   Widget build(BuildContext context) {
-    final InputDecoration dec = InputDecoration()
+    final InputDecoration dec = const InputDecoration()
       ..applyDefaults(Theme.of(context).inputDecorationTheme);
 
     const Widget vertSpace = SizedBox(height: 10);
@@ -40,23 +40,23 @@ class _RevenueFormState extends State<RevenueForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Revenue', style: Theme.of(context).textTheme.headline),
+        Text('Revenue', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 10),
         TextField(
             decoration: dec.copyWith(labelText: 'Product Id'),
             controller: productId),
         vertSpace,
         TextField(inputFormatters: <TextInputFormatter>[
-          WhitelistingTextInputFormatter(RegExp(r'[\d\.]'))
+          FilteringTextInputFormatter.allow(RegExp(r'[\d\.]'))
         ], decoration: dec.copyWith(labelText: 'Price'), controller: price),
         vertSpace,
         TextField(
             inputFormatters: <TextInputFormatter>[
-              WhitelistingTextInputFormatter(RegExp(r'\d'))
+              FilteringTextInputFormatter.allow(RegExp(r'\d'))
             ],
             decoration: dec.copyWith(labelText: 'Quantity'),
             controller: quantity),
-        RaisedButton(child: const Text('Send Revenue'), onPressed: onPress)
+        ElevatedButton(child: const Text('Send Revenue'), onPressed: onPress)
       ],
     );
   }

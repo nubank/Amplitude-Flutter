@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-
 import 'config.dart';
 import 'device_info.dart';
 import 'event.dart';
@@ -16,8 +14,8 @@ class AmplitudeFlutter {
     config ??= Config();
     provider = ServiceProvider(
         apiKey: apiKey,
-        timeout: config.sessionTimeout,
-        getCarrierInfo: config.getCarrierInfo);
+        timeout: config!.sessionTimeout,
+        getCarrierInfo: config!.getCarrierInfo);
     _init();
   }
 
@@ -26,7 +24,7 @@ class AmplitudeFlutter {
   }
 
   bool? getCarrierInfo;
-  Config config;
+  Config? config;
   ServiceProvider? provider;
   DeviceInfo? deviceInfo;
   Session? session;
@@ -46,7 +44,7 @@ class AmplitudeFlutter {
   Future<void> logEvent(
       {required String name,
       Map<String, dynamic> properties = const <String, String>{}}) async {
-    if (config.optOut) {
+    if (config!.optOut) {
       return Future.value(null);
     }
 
@@ -55,9 +53,7 @@ class AmplitudeFlutter {
 
     final Map<String, String> advertisingValues =
         await deviceInfo!.getAdvertisingInfo();
-    if (advertisingValues != null) {
-      event.addProps(<String, dynamic>{'api_properties': advertisingValues});
-    }
+    event.addProps(<String, dynamic>{'api_properties': advertisingValues});
     event.addProps(await deviceInfo!.getPlatformInfo());
 
     if (userId != null) {
@@ -69,7 +65,7 @@ class AmplitudeFlutter {
 
   /// Log many events
   Future<void> logBulkEvent(List<Map<String, dynamic>> events) async {
-    if (config.optOut) {
+    if (config!.optOut) {
       return Future.value(null);
     }
 
@@ -82,9 +78,7 @@ class AmplitudeFlutter {
     final platformInfo = await deviceInfo!.getPlatformInfo();
     
     for(final Event event in eventsList){
-      if (advertisingValues != null) {
-        event.addProps(<String, dynamic>{'api_properties': advertisingValues});
-      }
+      event.addProps(<String, dynamic>{'api_properties': advertisingValues});
       event.addProps(platformInfo);
       if (userId != null) {
         event.addProp('user_id', userId);
@@ -134,7 +128,7 @@ class AmplitudeFlutter {
   void _init() {
     deviceInfo = provider!.deviceInfo;
     session = provider!.session;
-    buffer = EventBuffer(provider!, config);
+    buffer = EventBuffer(provider!, config!);
 
     session!.start();
   }

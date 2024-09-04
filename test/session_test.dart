@@ -1,3 +1,4 @@
+// @dart=2.10
 import 'package:amplitude_flutter/src/session.dart';
 import 'package:amplitude_flutter/src/time_utils.dart';
 import 'package:flutter/widgets.dart';
@@ -7,7 +8,7 @@ import 'package:mockito/mockito.dart';
 class MockTimeUtils extends Mock implements TimeUtils {}
 
 void main() {
-  late Session session;
+  Session session;
   final TimeUtils time = MockTimeUtils();
 
   const int initialSessionId = 1;

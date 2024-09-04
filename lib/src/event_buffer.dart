@@ -97,7 +97,7 @@ class EventBuffer {
   Future<List<Event>> fetch(int count) async {
     assert(count >= 0);
 
-    final endRange = min(count, store!.length!);
+    final endRange = min(count, store!.length);
     return await store!.fetch(endRange);
   }
 

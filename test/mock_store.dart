@@ -2,8 +2,9 @@ import 'package:amplitude_flutter/src/event.dart';
 import 'package:amplitude_flutter/src/store.dart';
 
 class MockStore implements Store {
+  
   @override
-  int? length = 0;
+  late int length = 0;
   int curId = 10000;
 
   final List<Event> db = <Event>[];

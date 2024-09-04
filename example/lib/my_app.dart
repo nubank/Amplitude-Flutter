@@ -51,8 +51,8 @@ class _MyAppState extends State<MyApp> {
       setMessage: setMessage,
       child: MaterialApp(
         theme: ThemeData(
-            inputDecorationTheme: InputDecorationTheme(
-                contentPadding: const EdgeInsets.all(8), filled: true)),
+            inputDecorationTheme: const InputDecorationTheme(
+                contentPadding: EdgeInsets.all(8), filled: true)),
         home: Scaffold(
           appBar: AppBar(
             title: const Text('Amplitude Flutter'),
@@ -75,11 +75,11 @@ class _MyAppState extends State<MyApp> {
                 divider,
                 RevenueForm(),
                 divider,
-                RaisedButton(
+                ElevatedButton(
                   child: const Text('Flush Events'),
                   onPressed: _flushEvents,
                 ),
-                Text(_message, style: Theme.of(context).textTheme.body1)
+                Text(_message, style: Theme.of(context).textTheme.bodySmall)
               ],
             ),
           ),

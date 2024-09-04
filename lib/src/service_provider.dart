@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import 'client.dart';
 import 'device_info.dart';
 import 'session.dart';

@@ -3,8 +3,7 @@ import 'constants.dart';
 
 class MetadataStore {
   factory MetadataStore() => _instance ??= MetadataStore._();
-  MetadataStore._() {
-  }
+  MetadataStore._();
 
   static MetadataStore? _instance;
 

@@ -1,5 +1,4 @@
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:flutter/foundation.dart';
@@ -15,21 +14,21 @@ class DeviceInfo {
   bool getCarrierInfo;
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   Map<String, String?>? _deviceData = <String, String>{};
-  Map<String, String> _advData = <String, String>{};
+  final Map<String, String> _advData = <String, String>{};
 
   Future<Map<String, String?>?> getPlatformInfo() async {
     if (_deviceData!.isNotEmpty) {
       return _deviceData;
     }
 
-    Map<String, String?>? deviceData;
+    Map<String, String?> deviceData = {};
     try {
       if (defaultTargetPlatform == TargetPlatform.android) {
         deviceData = await _parseAndroidInfo(await deviceInfoPlugin.androidInfo);
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         deviceData = await _parseIosInfo(await deviceInfoPlugin.iosInfo);
       }
-      deviceData!.addAll(await _getApplicationInfo());
+      deviceData.addAll(await _getApplicationInfo());
       deviceData.addAll(await _getCurrentLocale());
       if (getCarrierInfo == true) {
         deviceData.addAll(await _getCarrierName());
@@ -88,7 +87,7 @@ class DeviceInfo {
   }
 
   Future<void> regenerateDeviceId() async {
-    await MetadataStore().setDeviceId(Uuid().v4() + 'R');
+    await MetadataStore().setDeviceId(const Uuid().v4() + 'R');
     _deviceData = {};
   }
 
@@ -101,7 +100,7 @@ class DeviceInfo {
     // generate a NEW random number followed by 'R'
     if (deviceId == null || Constants.kInvalidAndroidDeviceIds.contains(deviceId)) {
       deviceId = _advData[Constants.kPayloadAndroidAaid];
-      deviceId ??= Uuid().v4() + 'R';
+      deviceId ??= const Uuid().v4() + 'R';
 
       // Persist deviceId locally.
       MetadataStore().setDeviceId(deviceId);
@@ -127,7 +126,7 @@ class DeviceInfo {
     // generate a NEW random number followed by 'R'
     if (deviceId == null || Constants.kInvalidIosDeviceIds.contains(deviceId)) {
       deviceId = _advData[Constants.kPayloadIosIdfa];
-      deviceId ??= Uuid().v4() + 'R';
+      deviceId ??= const Uuid().v4() + 'R';
 
       // Persist deviceId locally.
       MetadataStore().setDeviceId(deviceId);

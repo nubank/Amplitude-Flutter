@@ -14,9 +14,7 @@ class Session with WidgetsBindingObserver {
   Session._internal(this.timeout) {
     _time = TimeUtils();
     final widgetsBinding = WidgetsBinding.instance;
-    if (widgetsBinding != null) {
-      widgetsBinding.addObserver(this);
-    }
+    widgetsBinding.addObserver(this);
   }
 
   @visibleForTesting
@@ -30,7 +28,7 @@ class Session with WidgetsBindingObserver {
   int timeout;
   int? sessionStart;
   int? lastActivity;
-
+  
   void start() {
     sessionStart = _time.currentTime();
   }

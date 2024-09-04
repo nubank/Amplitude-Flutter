@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:amplitude_flutter/amplitude_flutter.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Revenue', () {
