@@ -24,7 +24,8 @@ class DeviceInfo {
     Map<String, String?> deviceData = {};
     try {
       if (defaultTargetPlatform == TargetPlatform.android) {
-        deviceData = await _parseAndroidInfo(await deviceInfoPlugin.androidInfo);
+        deviceData =
+            await _parseAndroidInfo(await deviceInfoPlugin.androidInfo);
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         deviceData = await _parseIosInfo(await deviceInfoPlugin.iosInfo);
       }
@@ -41,7 +42,6 @@ class DeviceInfo {
   }
 
   Future<Map<String, String>> getAdvertisingInfo() async {
-
     return <String, String>{};
 
     // We are removing this block because since April 1 2022 it started crashing
@@ -52,7 +52,7 @@ class DeviceInfo {
       return _advData;
     }
 
-    final String advertisingId = await DeviceInfoHelper.advertisingId;
+    final String advertisingId = await deviceAdvertisingId;
     if (advertisingId == null) {
       _advData = <String, String>{};
       return _advData;
@@ -73,7 +73,7 @@ class DeviceInfo {
   }
 
   Future<Map<String, String>> _getCarrierName() async {
-    final String? name = await DeviceInfoHelper.getCarrierName;
+    final String? name = await getDeviceCarrierName;
     if (name != null && name.isNotEmpty) {
       return <String, String>{'carrier': name};
     } else {
@@ -82,7 +82,7 @@ class DeviceInfo {
   }
 
   Future<Map<String, String?>> _getCurrentLocale() async {
-    final String? name = await DeviceInfoHelper.currentLocale;
+    final String? name = await currentDeviceLocale;
     return <String, String?>{'language': name};
   }
 
@@ -91,14 +91,16 @@ class DeviceInfo {
     _deviceData = {};
   }
 
-  Future<Map<String, String?>> _parseAndroidInfo(AndroidDeviceInfo build) async {
+  Future<Map<String, String?>> _parseAndroidInfo(
+      AndroidDeviceInfo build) async {
     developer.log('buildDataAndroid", $build');
-    
+
     String? deviceId = await MetadataStore().getDeviceId();
 
     // If deviceId is null and invalid, we will use AAID or
     // generate a NEW random number followed by 'R'
-    if (deviceId == null || Constants.kInvalidAndroidDeviceIds.contains(deviceId)) {
+    if (deviceId == null ||
+        Constants.kInvalidAndroidDeviceIds.contains(deviceId)) {
       deviceId = _advData[Constants.kPayloadAndroidAaid];
       deviceId ??= const Uuid().v4() + 'R';
 
@@ -132,7 +134,7 @@ class DeviceInfo {
       MetadataStore().setDeviceId(deviceId);
     }
 
-    final String? deviceModel = await DeviceInfoHelper.deviceModel;
+    final String? deviceModel = await deviceModelInfo;
     return <String, String?>{
       'os_name': data.systemName,
       'os_version': data.systemVersion,

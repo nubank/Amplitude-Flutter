@@ -106,7 +106,7 @@ class Store {
     return await _init();
   }
 
-  Future<Database> _openDb() async {
+  Future<Database?> _openDb() async {
     try {
       final String dir = await getDatabasesPath();
       final String dbPath = path.join(dir, dbFile);

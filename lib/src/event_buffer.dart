@@ -17,7 +17,9 @@ class EventBuffer {
     flushInProgress = false;
 
     Timer.periodic(
-        Duration(seconds: config.flushPeriod), (Timer _t) => flush());
+      Duration(seconds: config.flushPeriod),
+      (Timer _t) => flush(),
+    );
   }
 
   final Config config;
@@ -29,11 +31,11 @@ class EventBuffer {
   int? numEvents;
 
   /// Returns number of events in buffer
-  int? get length => store!.length;
+  int get length => store?.length ?? 0;
 
   /// Adds a raw event hash to the buffer
   Future<void> add(Event event) async {
-    if (length! >= config.maxStoredEvents) {
+    if (length >= config.maxStoredEvents) {
       print('Max stored events reached.  Drop first event');
       await store!.drop(1);
     }
@@ -41,7 +43,7 @@ class EventBuffer {
     event.timestamp = TimeUtils().currentTime();
     await store!.add(event);
 
-    if (length! >= config.bufferSize) {
+    if (length >= config.bufferSize) {
       await flush();
     }
   }
@@ -52,8 +54,8 @@ class EventBuffer {
       return Future.value(null);
     }
 
-    if (length! + eventsList.length >= config.maxStoredEvents) {
-      final dropCount = length! + eventsList.length - config.maxStoredEvents;
+    if (length + eventsList.length >= config.maxStoredEvents) {
+      final dropCount = length + eventsList.length - config.maxStoredEvents;
       print('Max stored events reached.  Drop first $dropCount events');
       store!.drop(dropCount);
     }
@@ -68,7 +70,7 @@ class EventBuffer {
 
   /// Flushes all events in buffer
   Future<void> flush() async {
-    if (length! < 1 || flushInProgress) {
+    if (length < 1 || flushInProgress) {
       return;
     }
 

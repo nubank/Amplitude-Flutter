@@ -11,7 +11,7 @@ void main() {
   // Register the mock handler.
   setUpAll(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      switch(methodCall.method) {
+      switch (methodCall.method) {
         case 'carrierName':
           return 'AT&T';
         case 'deviceModel':
@@ -27,7 +27,7 @@ void main() {
   });
 
   test('amplitude_flutter channel is setup with carrierName method', () async {
-    final String name = await DeviceInfoHelper.getCarrierName;
+    final String name = await getDeviceCarrierName;
     expect(name, equals('AT&T'));
   });
 }
