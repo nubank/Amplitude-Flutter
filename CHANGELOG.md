@@ -1,3 +1,6 @@
+## 1.4.0
+* Updated to use null safety
+
 ## 1.3.5
 * Added 'addAll' method in 'Store' class to perform batch save on buffer.
 
