@@ -1,10 +1,10 @@
-import 'package:mockito/mockito.dart';
-
 import 'package:amplitude_flutter/src/client.dart';
 import 'package:amplitude_flutter/src/device_info.dart';
-import 'package:amplitude_flutter/src/store.dart';
-import 'package:amplitude_flutter/src/session.dart';
 import 'package:amplitude_flutter/src/service_provider.dart';
+import 'package:amplitude_flutter/src/session.dart';
+import 'package:amplitude_flutter/src/store.dart';
+import 'package:mockito/mockito.dart';
+
 import 'mock_client.dart';
 import 'mock_store.dart';
 
@@ -20,11 +20,11 @@ class MockServiceProvider implements ServiceProvider {
   }
 
   @override
-  Client client;
+  Client? client;
   @override
-  Store store;
+  Store? store;
   @override
-  Session session;
+  Session? session;
   @override
-  DeviceInfo deviceInfo;
+  DeviceInfo? deviceInfo;
 }

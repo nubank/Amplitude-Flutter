@@ -1,3 +1,4 @@
+// @dart=2.10
 import 'package:amplitude_flutter/src/client.dart';
 import 'package:amplitude_flutter/src/config.dart';
 import 'package:amplitude_flutter/src/event.dart';
@@ -23,7 +24,7 @@ void main() {
 
     setUp(() {
       provider = MockServiceProvider();
-      client = provider.client;
+      client = provider.client as MockClient;
       subject = EventBuffer(provider, Config());
     });
 

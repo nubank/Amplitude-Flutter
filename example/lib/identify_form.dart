@@ -29,13 +29,13 @@ class _IdentifyFormState extends State<IdentifyForm> {
 
   @override
   Widget build(BuildContext context) {
-    final InputDecoration dec = InputDecoration()
+    final InputDecoration dec = const InputDecoration()
       ..applyDefaults(Theme.of(context).inputDecorationTheme);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Identify', style: Theme.of(context).textTheme.headline),
+        Text('Identify', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 10),
         Row(children: <Widget>[
           Expanded(
@@ -50,7 +50,7 @@ class _IdentifyFormState extends State<IdentifyForm> {
                 onChanged: (String s) => userPropValue = s),
           ),
         ]),
-        RaisedButton(child: const Text('Send Identify'), onPressed: onPress)
+        ElevatedButton(child: const Text('Send Identify'), onPressed: onPress)
       ],
     );
   }

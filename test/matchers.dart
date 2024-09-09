@@ -6,8 +6,8 @@ class ContainsSubMap extends Matcher {
         .map<String, Matcher>((k, dynamic v) => MapEntry(k, equals(v)));
   }
 
-  Map<String, Matcher> _matcherMap;
-  Map<String, dynamic> _expectedMap;
+  late Map<String, Matcher> _matcherMap;
+  final Map<String, dynamic> _expectedMap;
 
   @override
   bool matches(dynamic actual, Map<dynamic, dynamic> matchState) {

@@ -3,7 +3,7 @@ class Revenue {
     payload = <String, dynamic>{QUANTITY: 1};
   }
 
-  Map<String, dynamic> payload;
+  Map<String, dynamic>? payload;
 
   static const EVENT = 'revenue_amount';
   static const PRODUCT_ID = r'$productId';
@@ -12,29 +12,29 @@ class Revenue {
   static const REVENUE_TYPE = r'$revenueType';
   static const RECEIPT = r'$receipt';
 
-  bool isValid() => payload[PRICE] != null;
+  bool isValid() => payload![PRICE] != null;
 
   void setProductId(String productId) {
-    payload[PRODUCT_ID] = productId;
+    payload![PRODUCT_ID] = productId;
   }
 
   void setPrice(double price) {
-    payload[PRICE] = price;
+    payload![PRICE] = price;
   }
 
   void setQuantity(int quantity) {
-    payload[QUANTITY] = quantity;
+    payload![QUANTITY] = quantity;
   }
 
   void setRevenueType(String revenueType) {
-    payload[REVENUE_TYPE] = revenueType;
+    payload![REVENUE_TYPE] = revenueType;
   }
 
   void setProperties(Map<String, dynamic> properties) {
-    payload.addAll(properties);
+    payload!.addAll(properties);
   }
 
   void setReceipt(String data) {
-    payload[RECEIPT] = data;
+    payload![RECEIPT] = data;
   }
 }

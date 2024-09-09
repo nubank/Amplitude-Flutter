@@ -1,3 +1,4 @@
+// @dart=2.10
 import 'package:amplitude_flutter/src/session.dart';
 import 'package:amplitude_flutter/src/time_utils.dart';
 import 'package:flutter/widgets.dart';

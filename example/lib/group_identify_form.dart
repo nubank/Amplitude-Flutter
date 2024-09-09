@@ -33,7 +33,7 @@ class _GroupIdentifyFormState extends State<GroupIdentifyForm> {
 
   @override
   Widget build(BuildContext context) {
-    final InputDecoration dec = InputDecoration()
+    final InputDecoration dec = const InputDecoration()
       ..applyDefaults(Theme.of(context).inputDecorationTheme);
 
     const sizedBox = SizedBox(width: 10);
@@ -41,7 +41,7 @@ class _GroupIdentifyFormState extends State<GroupIdentifyForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Group Identify', style: Theme.of(context).textTheme.headline),
+        Text('Group Identify', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 10),
         Row(children: <Widget>[
           Expanded(
@@ -68,7 +68,7 @@ class _GroupIdentifyFormState extends State<GroupIdentifyForm> {
             decoration: dec.copyWith(labelText: 'User Property Value'),
           )),
         ]),
-        RaisedButton(
+        ElevatedButton(
             child: const Text('Send Group Identify'), onPressed: onPress)
       ],
     );

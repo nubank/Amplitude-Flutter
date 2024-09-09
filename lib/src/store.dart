@@ -22,7 +22,7 @@ class Store {
   }
 
   static final Map<String, Store> _instances = {};
-  Database _db;
+  Database? _db;
   final String dbFile;
   int length = 0;
 
@@ -36,13 +36,13 @@ class Store {
     return result;
   }
 
-  Future<List<Object>> addAll(List<Event> events) async {
+  Future<List<Object?>> addAll(List<Event> events) async {
     final db = await _getDb();
     if (db == null) {
       return [];
     }
     final batch = db.batch();
-    for (final event in events){
+    for (final event in events) {
       batch.insert(EVENTS_TABLE, _serialize(event));
       length++;
     }
@@ -58,7 +58,7 @@ class Store {
     length = 0;
   }
 
-  Future<int> count() async {
+  Future<int?> count() async {
     final db = await _getDb();
     return _count(db);
   }
@@ -73,7 +73,7 @@ class Store {
     length -= resultCount;
   }
 
-  Future<void> delete(List<int> eventIds) async {
+  Future<void> delete(List<int?> eventIds) async {
     final db = await _getDb();
     if (db == null) {
       return;
@@ -92,21 +92,21 @@ class Store {
     return records.map((m) => _deserialize(m)).toList();
   }
 
-  Future<Database> _init() async {
+  Future<Database?> _init() async {
     final db = await _openDb();
     length = await _count(db);
     _db = db;
     return _db;
   }
 
-  Future<Database> _getDb() async {
+  Future<Database?> _getDb() async {
     if (_db != null) {
       return _db;
     }
     return await _init();
   }
 
-  Future<Database> _openDb() async {
+  Future<Database?> _openDb() async {
     try {
       final String dir = await getDatabasesPath();
       final String dbPath = path.join(dir, dbFile);
@@ -129,14 +129,17 @@ class Store {
     }
   }
 
-  Future<int> _count(Database db) async {
+  Future<int> _count(Database? db) async {
     if (db == null) {
       return 0;
     }
-    final List<Map<String, dynamic>> rows =
-        await db.rawQuery('SELECT COUNT(*) as count FROM $EVENTS_TABLE');
-    final int count = rows.single['count'];
-    return count;
+    try {
+      final List<Map<String, dynamic>> rows =
+          await db.rawQuery('SELECT COUNT(*) as count FROM $EVENTS_TABLE');
+      return rows.single['count'];
+    } catch (e) {
+      return 0;
+    }
   }
 
   Map<String, dynamic> _serialize(Event e) {

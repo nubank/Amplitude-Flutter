@@ -1,3 +1,4 @@
+// @dart=2.10
 import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -16,9 +17,9 @@ void main() {
 
   setUp(() {
     provider = MockServiceProvider();
-    client = provider.client;
-    deviceInfo = provider.deviceInfo;
-    session = provider.session;
+    client = provider.client as MockClient;
+    deviceInfo = provider.deviceInfo as MockDeviceInfo;
+    session = provider.session as MockSession;
 
     when(deviceInfo.getPlatformInfo()).thenAnswer(
         (_) => Future<Map<String, String>>.value({'platform': 'iOS'}));

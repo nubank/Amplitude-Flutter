@@ -11,8 +11,16 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('MyApp shows Send Event button', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp('API_KEY'));
+    await tester.runAsync(() async {
+      await tester.pumpWidget(const MyApp('API_KEY'));
 
-    expect(find.byWidget(const Text('Send Event')), findsOneWidget);
+      final Finder button = find.widgetWithText(ElevatedButton, 'Send Event');
+
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+
+      expect(button, findsOneWidget);
+      expect(tester.widget<ElevatedButton>(button).onPressed.runtimeType, VoidCallback);
+    });
   });
 }

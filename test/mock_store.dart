@@ -2,8 +2,9 @@ import 'package:amplitude_flutter/src/event.dart';
 import 'package:amplitude_flutter/src/store.dart';
 
 class MockStore implements Store {
+  
   @override
-  int length = 0;
+  late int length = 0;
   int curId = 10000;
 
   final List<Event> db = <Event>[];
@@ -17,7 +18,7 @@ class MockStore implements Store {
   }
 
   @override
-  Future<void> delete(List<int> eventIds) async {
+  Future<void> delete(List<int?> eventIds) async {
     db.removeWhere((Event event) => eventIds.contains(event.id));
   }
 

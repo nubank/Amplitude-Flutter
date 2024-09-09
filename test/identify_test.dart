@@ -1,9 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:amplitude_flutter/amplitude_flutter.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Identify', () {
-    Identify subject;
+    Identify? subject;
 
     setUp(() {
       subject = Identify();
@@ -11,15 +11,15 @@ void main() {
 
     group('default constructor', () {
       test('sets a blank identify payload', () {
-        expect(subject.payload, equals(<String, dynamic>{}));
+        expect(subject!.payload, equals(<String, dynamic>{}));
       });
     });
 
     group('adding user property operations', () {
       test(r'.set adds $set operations', () {
-        subject.set('cohort', 'Test A');
+        subject!.set('cohort', 'Test A');
         expect(
-            subject.payload,
+            subject!.payload,
             equals(
               {
                 r'$set': {'cohort': 'Test A'}
@@ -28,9 +28,9 @@ void main() {
       });
 
       test(r'.setOnce adds $setOnce operations', () {
-        subject.setOnce('cohort', 'Test A');
+        subject!.setOnce('cohort', 'Test A');
         expect(
-            subject.payload,
+            subject!.payload,
             equals(
               {
                 r'$setOnce': {'cohort': 'Test A'}
@@ -39,9 +39,9 @@ void main() {
       });
 
       test(r'.add adds $add operations', () {
-        subject.add('login_count', 1);
+        subject!.add('login_count', 1);
         expect(
-            subject.payload,
+            subject!.payload,
             equals(
               {
                 r'$add': {'login_count': 1}
@@ -50,9 +50,9 @@ void main() {
       });
 
       test(r'.append adds $append operations', () {
-        subject.append('tags', 'new tag');
+        subject!.append('tags', 'new tag');
         expect(
-            subject.payload,
+            subject!.payload,
             equals(
               {
                 r'$append': {'tags': 'new tag'}
@@ -61,9 +61,9 @@ void main() {
       });
 
       test(r'.unset adds $unset operations', () {
-        subject.unset('demo_user');
+        subject!.unset('demo_user');
         expect(
-            subject.payload,
+            subject!.payload,
             equals(
               {
                 r'$unset': {'demo_user': '-'}
@@ -73,14 +73,14 @@ void main() {
 
       test('combining multiple operations', () {
         subject
-          ..set('cohort', 'Test A')
+          !..set('cohort', 'Test A')
           ..setOnce('completed_onboarding', 'true')
           ..add('login_count', 1)
           ..append('tags', 'new tag')
           ..unset('demo_user');
 
         expect(
-            subject.payload,
+            subject!.payload,
             equals(
               {
                 r'$set': {'cohort': 'Test A'},
@@ -97,17 +97,17 @@ void main() {
       const String op = r'$set';
 
       test(r'adds an user property operation', () {
-        subject.addOp(op, 'cohort', 'Test A');
-        expect(subject.payload, containsPair(op, {'cohort': 'Test A'}));
+        subject!.addOp(op, 'cohort', 'Test A');
+        expect(subject!.payload, containsPair(op, {'cohort': 'Test A'}));
       });
 
       test(r'adds multiple properties for an operation', () {
         subject
-          ..addOp(op, 'cohort', 'Test A')
+          !..addOp(op, 'cohort', 'Test A')
           ..addOp(op, 'interests', ['chess', 'football']);
 
         expect(
-            subject.payload,
+            subject!.payload,
             containsPair(op, {
               'cohort': 'Test A',
               'interests': ['chess', 'football']
@@ -115,9 +115,9 @@ void main() {
       });
 
       test(r'overwrites entries with the same key for a given operation', () {
-        subject..addOp(op, 'cohort', 'Test A')..addOp(op, 'cohort', 'Test B');
+        subject!..addOp(op, 'cohort', 'Test A')..addOp(op, 'cohort', 'Test B');
 
-        expect(subject.payload, containsPair(op, {'cohort': 'Test B'}));
+        expect(subject!.payload, containsPair(op, {'cohort': 'Test B'}));
       });
     });
   });

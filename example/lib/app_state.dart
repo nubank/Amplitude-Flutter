@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:amplitude_flutter/amplitude_flutter.dart';
+import 'package:flutter/material.dart';
 
 class AppState extends InheritedWidget {
   const AppState({
@@ -19,6 +18,6 @@ class AppState extends InheritedWidget {
   }
 
   static AppState of(BuildContext context) {
-    return context.inheritFromWidgetOfExactType(AppState);
+    return context.dependOnInheritedWidgetOfExactType<AppState>();
   }
 }
