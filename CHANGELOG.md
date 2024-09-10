@@ -1,3 +1,6 @@
+## 1.4.1
+* Allow Dart 3
+
 ## 1.4.0
 * Updated to use null safety
 
