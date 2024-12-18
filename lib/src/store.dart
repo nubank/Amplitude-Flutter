@@ -31,9 +31,14 @@ class Store {
     if (db == null) {
       return 0;
     }
-    final result = await db.insert(EVENTS_TABLE, _serialize(event));
-    length++;
-    return result;
+
+    try {
+      final result = await db.insert(EVENTS_TABLE, _serialize(event));
+      length++;
+      return result;
+    } catch (ex) {
+      return 0;
+    }
   }
 
   Future<List<Object?>> addAll(List<Event> events) async {
@@ -41,12 +46,17 @@ class Store {
     if (db == null) {
       return [];
     }
-    final batch = db.batch();
-    for (final event in events) {
-      batch.insert(EVENTS_TABLE, _serialize(event));
-      length++;
+
+    try {
+      final batch = db.batch();
+      for (final event in events) {
+        batch.insert(EVENTS_TABLE, _serialize(event));
+        length++;
+      }
+      return await batch.commit(noResult: true);
+    } catch (ex) {
+      return [];
     }
-    return await batch.commit(noResult: true);
   }
 
   Future<void> empty() async {
@@ -54,8 +64,13 @@ class Store {
     if (db == null) {
       return;
     }
-    await db.rawDelete('DELETE FROM $EVENTS_TABLE; VACUUM;');
-    length = 0;
+
+    try {
+      await db.rawDelete('DELETE FROM $EVENTS_TABLE; VACUUM;');
+      length = 0;
+    } catch (ex) {
+      return;
+    }
   }
 
   Future<int?> count() async {
@@ -68,9 +83,14 @@ class Store {
     if (db == null) {
       return;
     }
-    final resultCount = await db.rawDelete(
-        'DELETE FROM $EVENTS_TABLE WHERE $COL_ID IN (SELECT T2.$COL_ID FROM $EVENTS_TABLE T2 ORDER BY T2.$COL_ID LIMIT $count)');
-    length -= resultCount;
+
+    try {
+      final resultCount = await db.rawDelete(
+          'DELETE FROM $EVENTS_TABLE WHERE $COL_ID IN (SELECT T2.$COL_ID FROM $EVENTS_TABLE T2 ORDER BY T2.$COL_ID LIMIT $count)');
+      length -= resultCount;
+    } catch (ex) {
+      return;
+    }
   }
 
   Future<void> delete(List<int?> eventIds) async {
@@ -78,9 +98,14 @@ class Store {
     if (db == null) {
       return;
     }
-    final count = await db.rawDelete(
-        'DELETE FROM $EVENTS_TABLE WHERE id IN (${eventIds.join(',')})');
-    length -= count;
+
+    try {
+      final count = await db.rawDelete(
+          'DELETE FROM $EVENTS_TABLE WHERE id IN (${eventIds.join(',')})');
+      length -= count;
+    } catch (ex) {
+      return;
+    }
   }
 
   Future<List<Event>> fetch(int count) async {
@@ -88,8 +113,14 @@ class Store {
     if (db == null) {
       return [];
     }
-    final records = await db.query(EVENTS_TABLE, limit: count, orderBy: COL_ID);
-    return records.map((m) => _deserialize(m)).toList();
+
+    try {
+      final records =
+          await db.query(EVENTS_TABLE, limit: count, orderBy: COL_ID);
+      return records.map((m) => _deserialize(m)).toList();
+    } catch (ex) {
+      return [];
+    }
   }
 
   Future<Database?> _init() async {

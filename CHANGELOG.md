@@ -1,3 +1,6 @@
+## 1.4.2
+* Handling DatabaseException and Bad State errors
+
 ## 1.4.1
 * Allow Dart 3
 
