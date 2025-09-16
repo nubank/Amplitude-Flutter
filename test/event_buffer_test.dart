@@ -1,11 +1,10 @@
-// @dart=2.10
 import 'package:amplitude_flutter/src/client.dart';
 import 'package:amplitude_flutter/src/config.dart';
 import 'package:amplitude_flutter/src/event.dart';
 import 'package:amplitude_flutter/src/event_buffer.dart';
 import 'package:amplitude_flutter/src/store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'matchers.dart';
 import 'mock_client.dart';
@@ -17,10 +16,10 @@ class MockitoStore extends Mock implements Store {}
 
 void main() {
   group('EventBuffer', () {
-    MockServiceProvider provider;
-    MockClient client;
+    late MockServiceProvider provider;
+    late MockClient client;
 
-    EventBuffer subject;
+    late EventBuffer subject;
 
     setUp(() {
       provider = MockServiceProvider();
@@ -166,8 +165,8 @@ void main() {
     });
 
     group('.flush', () {
-      Client mockClient;
-      Store mockStore;
+      late Client mockClient;
+      late Store mockStore;
 
       setUp(() {
         mockClient = MockitoClient();
@@ -181,54 +180,59 @@ void main() {
           Event.uuid('flush 3', id: 3)
         ];
 
-        when(mockStore.length).thenReturn(events.length);
-        when(mockStore.fetch(any)).thenAnswer((_) => Future.value(events));
+        when(() => mockStore.length).thenReturn(events.length);
+        when(() => mockStore.fetch(any()))
+            .thenAnswer((_) => Future.value(events));
       });
 
       test('deletes events on success', () async {
-        when(mockClient.post(any)).thenAnswer((_) => Future.value(200));
+        when(() => mockStore.delete(any())).thenAnswer((_) => Future.value());
+        when(() => mockClient.post(any())).thenAnswer((_) => Future.value(200));
 
         await subject.flush();
 
-        verify(mockClient.post(any)).called(1);
-        verify(mockStore.delete([1, 2, 3])).called(1);
+        verify(() => mockClient.post(any())).called(1);
+        verify(() => mockStore.delete([1, 2, 3])).called(1);
       });
 
       test('does not delete events on failure', () async {
-        when(mockClient.post(any)).thenAnswer((_) => Future.value(400));
+        when(() => mockClient.post(any())).thenAnswer((_) => Future.value(400));
 
         await subject.flush();
 
-        verify(mockClient.post(any)).called(1);
-        verifyNever(mockStore.delete(any));
+        verify(() => mockClient.post(any())).called(1);
+        verifyNever(() => mockStore.delete(any()));
       });
 
       test('reduces num events when payload too large', () async {
-        when(mockClient.post(any)).thenAnswer((_) => Future.value(413));
+        when(() => mockStore.delete(any())).thenAnswer((_) => Future.value());
+        when(() => mockClient.post(any())).thenAnswer((_) => Future.value(413));
         expect(subject.numEvents, equals(null));
 
         await subject.flush();
 
-        verify(mockClient.post(any)).called(1);
-        verifyNever(mockStore.delete(any));
+        verify(() => mockClient.post(any())).called(1);
+        verifyNever(() => mockStore.delete(any()));
         expect(subject.numEvents, equals(1));
 
-        when(mockClient.post(any)).thenAnswer((_) => Future.value(200));
+        when(() => mockClient.post(any())).thenAnswer((_) => Future.value(200));
 
         await subject.flush();
-        verify(mockStore.delete(any)).called(1);
+        verify(() => mockStore.delete(any())).called(1);
         expect(subject.numEvents, equals(null));
       });
 
       test('drops an event if it is too large', () async {
-        when(mockClient.post(any)).thenAnswer((_) => Future.value(413));
+        when(() => mockStore.delete(any())).thenAnswer((_) => Future.value());
+        when(() => mockClient.post(any())).thenAnswer((_) => Future.value(413));
         subject.numEvents = 1;
         final event = Event.uuid('massive event', id: 99);
-        when(mockStore.fetch(any)).thenAnswer((_) => Future.value([event]));
+        when(() => mockStore.fetch(any()))
+            .thenAnswer((_) => Future.value([event]));
 
         await subject.flush();
 
-        verify(mockStore.delete([99])).called(1);
+        verify(() => mockStore.delete([99])).called(1);
         expect(subject.numEvents, equals(null));
       });
     });

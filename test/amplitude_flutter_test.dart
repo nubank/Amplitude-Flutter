@@ -1,19 +1,18 @@
-// @dart=2.10
 import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'matchers.dart';
 import 'mock_client.dart';
 import 'mock_service_provider.dart';
 
 void main() {
-  AmplitudeFlutter amplitude;
+  late AmplitudeFlutter amplitude;
 
-  MockClient client;
-  MockDeviceInfo deviceInfo;
-  MockSession session;
-  MockServiceProvider provider;
+  late MockClient client;
+  late MockDeviceInfo deviceInfo;
+  late MockSession session;
+  late MockServiceProvider provider;
 
   setUp(() {
     provider = MockServiceProvider();
@@ -21,9 +20,11 @@ void main() {
     deviceInfo = provider.deviceInfo as MockDeviceInfo;
     session = provider.session as MockSession;
 
-    when(deviceInfo.getPlatformInfo()).thenAnswer(
+    when(() => deviceInfo.getPlatformInfo()).thenAnswer(
         (_) => Future<Map<String, String>>.value({'platform': 'iOS'}));
-    when(session.getSessionId()).thenAnswer((_) => '123');
+    when(() => deviceInfo.getAdvertisingInfo()).thenAnswer(
+        (_) => Future<Map<String, String>>.value(<String, String>{}));
+    when(() => session.getSessionId()).thenAnswer((_) => '123');
 
     client.reset();
 

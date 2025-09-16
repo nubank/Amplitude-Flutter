@@ -2,10 +2,11 @@ import 'package:amplitude_flutter/src/event.dart';
 import 'package:amplitude_flutter/src/store.dart';
 
 class MockStore implements Store {
-  
   @override
   late int length = 0;
   int curId = 10000;
+  @override
+  bool enableUuid = true;
 
   final List<Event> db = <Event>[];
 
@@ -41,7 +42,7 @@ class MockStore implements Store {
 
   @override
   String get dbFile => 'amp.db';
-  
+
   @override
   Future<List<Object>> addAll(List<Event> events) {
     for (final Event event in events) {
@@ -51,7 +52,7 @@ class MockStore implements Store {
     }
     return Future.value(events);
   }
-  
+
   @override
   Future<void> drop(int count) {
     db.removeRange(0, count);
