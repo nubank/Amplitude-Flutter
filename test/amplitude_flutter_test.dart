@@ -63,16 +63,20 @@ void main() {
 
     expect(2, client.postCalls.single.length);
 
-    expect(client.postCalls.single[0], ContainsSubMap(<String, dynamic>{
+    expect(
+        client.postCalls.single[0],
+        ContainsSubMap(<String, dynamic>{
           'event_type': 'test1',
           'session_id': '123',
           'platform': 'iOS',
           'timestamp': isInstanceOf<int>(),
-          'property-1': 'value-1', 
+          'property-1': 'value-1',
           'property-2': 'value-2',
         }));
 
-    expect(client.postCalls.single[1], ContainsSubMap(<String, dynamic>{
+    expect(
+        client.postCalls.single[1],
+        ContainsSubMap(<String, dynamic>{
           'event_type': 'test2',
           'session_id': '123',
           'platform': 'iOS',

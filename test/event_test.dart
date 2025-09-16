@@ -8,12 +8,12 @@ void main() {
     late Event subject;
 
     setUp(() {
-      subject = Event('Event Unit Test');
+      subject = Event.uuid('Event Unit Test');
     });
 
     group('uuid', () {
       test('generates a uuid', () {
-        final event = Event('test');
+        final event = Event.uuid('test');
         expect(event.uuid, isNotNull);
       });
     });
@@ -22,8 +22,8 @@ void main() {
       test('adds the passed props if any', () {
         expect(subject.props, isEmpty);
 
-        subject =
-            Event('some props', props: <String, dynamic>{'cohort': 'test a'});
+        subject = Event.uuid('some props',
+            props: <String, dynamic>{'cohort': 'test a'});
 
         expect(subject.props, containsPair('cohort', 'test a'));
       });
@@ -82,11 +82,13 @@ void main() {
 
     group('.toPayload', () {
       test('properly formats an API payload', () {
-        subject =
-            Event('click', sessionId: '123', id: 99, props: <String, dynamic>{
-          'user_properties': {'cohort': 'test a'}
-        })
-              ..timestamp = 12345;
+        subject = Event.uuid('click',
+            sessionId: '123',
+            id: 99,
+            props: <String, dynamic>{
+              'user_properties': {'cohort': 'test a'}
+            })
+          ..timestamp = 12345;
 
         expect(
             subject.toPayload(),
