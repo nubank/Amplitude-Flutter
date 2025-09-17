@@ -29,7 +29,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * AmplitudeFlutterPlugin
@@ -52,31 +51,6 @@ public class AmplitudeFlutterPlugin implements FlutterPlugin, ActivityAware, Met
     private AmplitudeFlutterPlugin(Activity activity) {
         this.mActivity = activity;
         mTelephonyManager = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-    }
-
-    /**
-     * Plugin registration. This's for Flutter SDK pre 1.12 support.
-     */
-    public static void registerWith(Registrar registrar) {
-        final AmplitudeFlutterPlugin amplitudeFlutterPlugin = new AmplitudeFlutterPlugin(registrar.activity());
-        amplitudeFlutterPlugin.setupChannel(registrar.messenger());
-
-        /** Adds a callback allowing the plugin to take part in handling incoming calls
-         * to Activity#onRequestPermissionsResult(int, String[], int[])
-         **/
-        registrar.addRequestPermissionsResultListener(new PluginRegistry.RequestPermissionsResultListener() {
-            @Override
-            public boolean onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-                if (requestCode == READ_PHONE_STATE) {
-                    boolean permissionGranted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    amplitudeFlutterPlugin.processCarrierResult(permissionGranted);
-                    return true;
-                } else {
-                    // We don't care other permissions other than READ_PHONE_STATE
-                    return false;
-                }
-            }
-        });
     }
 
     @Override
