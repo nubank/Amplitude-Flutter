@@ -1,3 +1,6 @@
+## 1.4.5
+* Fix mandatory property ServiceProvider
+
 ## 1.4.4
 * Update libs
 
