@@ -1,3 +1,6 @@
+## 1.4.4
+* Update libs
+
 ## 1.4.3
 * Create option to disable the usage of UUID identification for each event
 * Update libs
