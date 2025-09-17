@@ -8,7 +8,7 @@ class ServiceProvider {
       {required String apiKey,
       required int timeout,
       required bool getCarrierInfo,
-      required bool enableUuid,
+      bool enableUuid = true,
       this.store}) {
     client = Client(apiKey);
     deviceInfo = DeviceInfo(getCarrierInfo);
