@@ -1,19 +1,18 @@
-// @dart=2.10
 import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'matchers.dart';
 import 'mock_client.dart';
 import 'mock_service_provider.dart';
 
 void main() {
-  AmplitudeFlutter amplitude;
+  late AmplitudeFlutter amplitude;
 
-  MockClient client;
-  MockDeviceInfo deviceInfo;
-  MockSession session;
-  MockServiceProvider provider;
+  late MockClient client;
+  late MockDeviceInfo deviceInfo;
+  late MockSession session;
+  late MockServiceProvider provider;
 
   setUp(() {
     provider = MockServiceProvider();
@@ -21,9 +20,11 @@ void main() {
     deviceInfo = provider.deviceInfo as MockDeviceInfo;
     session = provider.session as MockSession;
 
-    when(deviceInfo.getPlatformInfo()).thenAnswer(
+    when(() => deviceInfo.getPlatformInfo()).thenAnswer(
         (_) => Future<Map<String, String>>.value({'platform': 'iOS'}));
-    when(session.getSessionId()).thenAnswer((_) => '123');
+    when(() => deviceInfo.getAdvertisingInfo()).thenAnswer(
+        (_) => Future<Map<String, String>>.value(<String, String>{}));
+    when(() => session.getSessionId()).thenAnswer((_) => '123');
 
     client.reset();
 
@@ -63,16 +64,20 @@ void main() {
 
     expect(2, client.postCalls.single.length);
 
-    expect(client.postCalls.single[0], ContainsSubMap(<String, dynamic>{
+    expect(
+        client.postCalls.single[0],
+        ContainsSubMap(<String, dynamic>{
           'event_type': 'test1',
           'session_id': '123',
           'platform': 'iOS',
           'timestamp': isInstanceOf<int>(),
-          'property-1': 'value-1', 
+          'property-1': 'value-1',
           'property-2': 'value-2',
         }));
 
-    expect(client.postCalls.single[1], ContainsSubMap(<String, dynamic>{
+    expect(
+        client.postCalls.single[1],
+        ContainsSubMap(<String, dynamic>{
           'event_type': 'test2',
           'session_id': '123',
           'platform': 'iOS',
@@ -198,6 +203,162 @@ void main() {
       await amplitude.flushEvents();
 
       expect(client.postCalls, isEmpty);
+    });
+  });
+
+  group('enableUuid configuration', () {
+    group('when enableUuid is true (default)', () {
+      test('logEvent creates events with UUIDs', () async {
+        amplitude =
+            AmplitudeFlutter.private(provider, Config(enableUuid: true));
+        await amplitude.logEvent(name: 'test');
+        await amplitude.flushEvents();
+
+        expect(client.postCalls.single.single['uuid'], isNotNull);
+        expect(client.postCalls.single.single['uuid'], isA<String>());
+
+        // Verify UUID format (v4)
+        final uuidRegex = RegExp(
+            r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+            caseSensitive: false);
+        expect(client.postCalls.single.single['uuid'], matches(uuidRegex));
+      });
+
+      test('logBulkEvent creates events with UUIDs', () async {
+        amplitude =
+            AmplitudeFlutter.private(provider, Config(enableUuid: true));
+        final events = [
+          {
+            'name': 'test1',
+            'properties': {'prop1': 'value1'}
+          },
+          {
+            'name': 'test2',
+            'properties': {'prop2': 'value2'}
+          },
+        ];
+
+        await amplitude.logBulkEvent(events);
+        await amplitude.flushEvents();
+
+        expect(client.postCalls.single, hasLength(2));
+
+        for (final event in client.postCalls.single) {
+          expect(event['uuid'], isNotNull);
+          expect(event['uuid'], isA<String>());
+
+          final uuidRegex = RegExp(
+              r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+              caseSensitive: false);
+          expect(event['uuid'], matches(uuidRegex));
+        }
+
+        // Verify UUIDs are unique
+        expect(client.postCalls.single[0]['uuid'],
+            isNot(equals(client.postCalls.single[1]['uuid'])));
+      });
+
+      test('identify events include UUIDs', () async {
+        amplitude =
+            AmplitudeFlutter.private(provider, Config(enableUuid: true));
+        await amplitude.identify(Identify()..set('cohort', 'test'));
+        await amplitude.flushEvents();
+
+        expect(client.postCalls.single.single['uuid'], isNotNull);
+        expect(client.postCalls.single.single['uuid'], isA<String>());
+      });
+
+      test('revenue events include UUIDs', () async {
+        amplitude =
+            AmplitudeFlutter.private(provider, Config(enableUuid: true));
+        final revenue = Revenue()
+          ..setPrice(10.99)
+          ..setQuantity(2);
+        await amplitude.logRevenue(revenue);
+        await amplitude.flushEvents();
+
+        expect(client.postCalls.single.single['uuid'], isNotNull);
+        expect(client.postCalls.single.single['uuid'], isA<String>());
+      });
+    });
+
+    group('when enableUuid is false', () {
+      test('logEvent creates events without UUIDs', () async {
+        amplitude =
+            AmplitudeFlutter.private(provider, Config(enableUuid: false));
+        await amplitude.logEvent(name: 'test');
+        await amplitude.flushEvents();
+
+        expect(client.postCalls.single.single.containsKey('uuid'), isTrue);
+        expect(client.postCalls.single.single['uuid'], isNull);
+      });
+
+      test('logBulkEvent creates events without UUIDs', () async {
+        amplitude =
+            AmplitudeFlutter.private(provider, Config(enableUuid: false));
+        final events = [
+          {
+            'name': 'test1',
+            'properties': {'prop1': 'value1'}
+          },
+          {
+            'name': 'test2',
+            'properties': {'prop2': 'value2'}
+          },
+        ];
+
+        await amplitude.logBulkEvent(events);
+        await amplitude.flushEvents();
+
+        expect(client.postCalls.single, hasLength(2));
+
+        for (final event in client.postCalls.single) {
+          expect(event.containsKey('uuid'), isTrue);
+          expect(event['uuid'], isNull);
+        }
+      });
+
+      test('identify events do not include UUIDs', () async {
+        amplitude =
+            AmplitudeFlutter.private(provider, Config(enableUuid: false));
+        await amplitude.identify(Identify()..set('cohort', 'test'));
+        await amplitude.flushEvents();
+
+        expect(client.postCalls.single.single.containsKey('uuid'), isTrue);
+        expect(client.postCalls.single.single['uuid'], isNull);
+      });
+
+      test('revenue events do not include UUIDs', () async {
+        amplitude =
+            AmplitudeFlutter.private(provider, Config(enableUuid: false));
+        final revenue = Revenue()
+          ..setPrice(10.99)
+          ..setQuantity(2);
+        await amplitude.logRevenue(revenue);
+        await amplitude.flushEvents();
+
+        expect(client.postCalls.single.single.containsKey('uuid'), isTrue);
+        expect(client.postCalls.single.single['uuid'], isNull);
+      });
+    });
+
+    group('enableUuid configuration propagation', () {
+      test('config enableUuid propagates to AmplitudeFlutter instance', () {
+        final configWithUuid = Config(enableUuid: true);
+        final amplitudeWithUuid =
+            AmplitudeFlutter.private(provider, configWithUuid);
+        expect(amplitudeWithUuid.enableUuid, isTrue);
+
+        final configWithoutUuid = Config(enableUuid: false);
+        final amplitudeWithoutUuid =
+            AmplitudeFlutter.private(provider, configWithoutUuid);
+        expect(amplitudeWithoutUuid.enableUuid, isFalse);
+      });
+
+      test('default config has enableUuid set to true', () {
+        final defaultConfig = Config();
+        expect(defaultConfig.enableUuid, isTrue);
+      });
     });
   });
 }

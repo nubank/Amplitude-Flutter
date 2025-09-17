@@ -2,10 +2,11 @@ import 'package:amplitude_flutter/src/event.dart';
 import 'package:amplitude_flutter/src/store.dart';
 
 class MockStore implements Store {
-  
   @override
   late int length = 0;
   int curId = 10000;
+  @override
+  bool enableUuid = true;
 
   final List<Event> db = <Event>[];
 
@@ -19,7 +20,9 @@ class MockStore implements Store {
 
   @override
   Future<void> delete(List<int?> eventIds) async {
+    final int originalLength = db.length;
     db.removeWhere((Event event) => eventIds.contains(event.id));
+    length -= (originalLength - db.length);
   }
 
   @override
@@ -35,13 +38,14 @@ class MockStore implements Store {
 
   @override
   Future<List<Event>> fetch(int count) {
-    final List<Event> popped = db.sublist(0, count);
+    final int actualCount = count > db.length ? db.length : count;
+    final List<Event> popped = db.sublist(0, actualCount);
     return Future.value(popped);
   }
 
   @override
   String get dbFile => 'amp.db';
-  
+
   @override
   Future<List<Object>> addAll(List<Event> events) {
     for (final Event event in events) {
@@ -51,11 +55,14 @@ class MockStore implements Store {
     }
     return Future.value(events);
   }
-  
+
   @override
   Future<void> drop(int count) {
-    db.removeRange(0, count);
-    length -= count;
+    final int actualCount = count > db.length ? db.length : count;
+    if (actualCount > 0) {
+      db.removeRange(0, actualCount);
+      length -= actualCount;
+    }
     return Future.value(null);
   }
 }

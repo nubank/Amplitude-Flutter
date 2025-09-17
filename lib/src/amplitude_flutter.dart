@@ -13,9 +13,11 @@ class AmplitudeFlutter {
   AmplitudeFlutter(String apiKey, [this.config]) {
     config ??= Config();
     provider = ServiceProvider(
-        apiKey: apiKey,
-        timeout: config!.sessionTimeout,
-        getCarrierInfo: config!.getCarrierInfo);
+      apiKey: apiKey,
+      timeout: config!.sessionTimeout,
+      getCarrierInfo: config!.getCarrierInfo,
+      enableUuid: config!.enableUuid,
+    );
     _init();
   }
 
@@ -24,6 +26,7 @@ class AmplitudeFlutter {
   }
 
   bool? getCarrierInfo;
+  late bool enableUuid;
   Config? config;
   ServiceProvider? provider;
   DeviceInfo? deviceInfo;
@@ -48,8 +51,11 @@ class AmplitudeFlutter {
       return Future.value(null);
     }
 
-    final Event event =
-        Event(name, sessionId: session!.getSessionId(), props: properties);
+    final Event event = enableUuid
+        ? Event.uuid(name,
+            sessionId: session!.getSessionId(), props: properties)
+        : Event.noUuid(name,
+            sessionId: session!.getSessionId(), props: properties);
 
     final Map<String, String> advertisingValues =
         await deviceInfo!.getAdvertisingInfo();
@@ -70,14 +76,26 @@ class AmplitudeFlutter {
     }
 
     final List<Event> eventsList = events
-        .map((Map<String, dynamic> event) =>
-            Event(event['name'], sessionId: session!.getSessionId(), props: event['properties']),)
+        .map(
+          (Map<String, dynamic> event) => enableUuid
+              ? Event.uuid(
+                  event['name'],
+                  sessionId: session!.getSessionId(),
+                  props: event['properties'],
+                )
+              : Event.noUuid(
+                  event['name'],
+                  sessionId: session!.getSessionId(),
+                  props: event['properties'],
+                ),
+        )
         .toList();
 
-    final Map<String, String> advertisingValues = await deviceInfo!.getAdvertisingInfo();
+    final Map<String, String> advertisingValues =
+        await deviceInfo!.getAdvertisingInfo();
     final platformInfo = await deviceInfo!.getPlatformInfo();
-    
-    for(final Event event in eventsList){
+
+    for (final Event event in eventsList) {
       event.addProps(<String, dynamic>{'api_properties': advertisingValues});
       event.addProps(platformInfo);
       if (userId != null) {
@@ -126,6 +144,7 @@ class AmplitudeFlutter {
   Future<void> flushEvents() => buffer.flush();
 
   void _init() {
+    enableUuid = config!.enableUuid;
     deviceInfo = provider!.deviceInfo;
     session = provider!.session;
     buffer = EventBuffer(provider!, config!);

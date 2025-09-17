@@ -1,4 +1,3 @@
-// @dart=2.10
 import 'package:amplitude_flutter/src/device_info_helper.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,7 +26,7 @@ void main() {
   });
 
   test('amplitude_flutter channel is setup with carrierName method', () async {
-    final String name = await getDeviceCarrierName;
+    final String name = await getDeviceCarrierName ?? 'unknown';
     expect(name, equals('AT&T'));
   });
 }

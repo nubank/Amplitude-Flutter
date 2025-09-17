@@ -64,7 +64,6 @@ class EventBuffer {
       e.timestamp = TimeUtils().currentTime();
       return e;
     }).toList();
-
     return store!.addAll(events);
   }
 

@@ -1,14 +1,13 @@
-// @dart=2.10
 import 'package:amplitude_flutter/src/session.dart';
 import 'package:amplitude_flutter/src/time_utils.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockTimeUtils extends Mock implements TimeUtils {}
 
 void main() {
-  Session session;
+  late Session session;
   final TimeUtils time = MockTimeUtils();
 
   const int initialSessionId = 1;
@@ -17,7 +16,7 @@ void main() {
   const int expiredTime = 200;
 
   setUp(() {
-    when(time.currentTime()).thenAnswer((_) => initialSessionId);
+    when(() => time.currentTime()).thenAnswer((_) => initialSessionId);
 
     session = Session.private(time, timeout);
   });
@@ -25,7 +24,7 @@ void main() {
   test('refresh() keeps the current session if within timeout', () async {
     session.start();
 
-    when(time.currentTime()).thenAnswer((_) => activeTime);
+    when(() => time.currentTime()).thenAnswer((_) => activeTime);
 
     expect(session.getSessionId(), initialSessionId.toString());
   });
@@ -33,7 +32,7 @@ void main() {
   test('refresh() keeps the current session if in foreground', () async {
     session.start();
 
-    when(time.currentTime()).thenAnswer((_) => expiredTime);
+    when(() => time.currentTime()).thenAnswer((_) => expiredTime);
 
     expect(session.getSessionId(), initialSessionId.toString());
   });
@@ -42,7 +41,7 @@ void main() {
       () async {
     session.start();
 
-    when(time.currentTime()).thenAnswer((_) => activeTime);
+    when(() => time.currentTime()).thenAnswer((_) => activeTime);
 
     session.didChangeAppLifecycleState(AppLifecycleState.inactive);
     session.didChangeAppLifecycleState(AppLifecycleState.resumed);
@@ -53,7 +52,7 @@ void main() {
   test('refresh() resets the session if resumed and outside timeout', () async {
     session.start();
 
-    when(time.currentTime()).thenAnswer((_) => expiredTime);
+    when(() => time.currentTime()).thenAnswer((_) => expiredTime);
 
     session.didChangeAppLifecycleState(AppLifecycleState.inactive);
     session.didChangeAppLifecycleState(AppLifecycleState.resumed);

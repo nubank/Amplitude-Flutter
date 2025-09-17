@@ -3,10 +3,48 @@ import 'package:uuid/uuid.dart';
 import 'constants.dart';
 
 class Event {
-  Event(this.name,
-      {this.sessionId, this.timestamp, this.id, Map<String, dynamic>? props}) {
+  Event._(
+    this.name, {
+    this.sessionId,
+    this.timestamp,
+    this.id,
+    Map<String, dynamic>? props,
+  }) {
     addProps(props);
-    uuid = const Uuid().v4();
+  }
+
+  /// Factory method that creates an Event with a default UUID
+  factory Event.uuid(
+    String name, {
+    String? sessionId,
+    int? timestamp,
+    int? id,
+    Map<String, dynamic>? props,
+  }) {
+    return Event._(
+      name,
+      sessionId: sessionId,
+      timestamp: timestamp,
+      id: id,
+      props: props,
+    )..uuid = const Uuid().v4();
+  }
+
+  /// Factory method that creates an Event without a UUID
+  factory Event.noUuid(
+    String name, {
+    String? sessionId,
+    int? timestamp,
+    int? id,
+    Map<String, dynamic>? props,
+  }) {
+    return Event._(
+      name,
+      sessionId: sessionId,
+      timestamp: timestamp,
+      id: id,
+      props: props,
+    );
   }
 
   int? id;
@@ -35,8 +73,8 @@ class Event {
       'uuid': uuid,
       'library': {
         'name': Constants.packageName,
-        'version': Constants.packageVersion
-      }
+        'version': Constants.packageVersion,
+      },
     }..addAll(props);
   }
 }
