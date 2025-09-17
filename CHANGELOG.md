@@ -1,3 +1,7 @@
+## 1.4.3
+* Create option to disable the usage of UUID identification for each event
+* Update libs
+
 ## 1.4.2
 * Handling DatabaseException and Bad State errors
 

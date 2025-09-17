@@ -14,13 +14,17 @@ const String COL_PROPS = 'props_json';
 const String DEFAULT_DB_NAME = 'amp.db';
 
 class Store {
-  factory Store({String dbFile = DEFAULT_DB_NAME}) =>
-      _instances.putIfAbsent(dbFile, () => Store._(dbFile));
+  factory Store({
+    String dbFile = DEFAULT_DB_NAME,
+    bool enableUuid = true,
+  }) =>
+      _instances.putIfAbsent(dbFile, () => Store._(dbFile, enableUuid));
 
-  Store._(this.dbFile) {
+  Store._(this.dbFile, this.enableUuid) {
     _init();
   }
 
+  bool enableUuid;
   static final Map<String, Store> _instances = {};
   Database? _db;
   final String dbFile;
@@ -181,9 +185,15 @@ class Store {
       ..[COL_PROPS] = json.encode(e.props);
   }
 
-  Event _deserialize(Map<String, dynamic> map) => Event(map[COL_EVENT_TYPE],
-      sessionId: map[COL_SESSION_ID],
-      timestamp: map[COL_TIMESTAMP],
-      id: map[COL_ID],
-      props: json.decode(map[COL_PROPS]));
+  Event _deserialize(Map<String, dynamic> map) => enableUuid
+      ? Event.uuid(map[COL_EVENT_TYPE],
+          sessionId: map[COL_SESSION_ID],
+          timestamp: map[COL_TIMESTAMP],
+          id: map[COL_ID],
+          props: json.decode(map[COL_PROPS]))
+      : Event.noUuid(map[COL_EVENT_TYPE],
+          sessionId: map[COL_SESSION_ID],
+          timestamp: map[COL_TIMESTAMP],
+          id: map[COL_ID],
+          props: json.decode(map[COL_PROPS]));
 }
