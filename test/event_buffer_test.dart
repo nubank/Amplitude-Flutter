@@ -57,9 +57,10 @@ void main() {
         await subject.add(Event.uuid('flush test'));
         expect(client.postCallCount, equals(0));
 
+        expect(subject.length, equals(1));
         await subject.add(Event.uuid('event 2'));
         expect(client.postCallCount, equals(1));
-        expect(subject.length, equals(2));
+        expect(subject.length, equals(0));
 
         expect(
             client.postCalls.single.first,
