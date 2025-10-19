@@ -43,8 +43,10 @@ class DeviceInfo {
     return deviceData;
   }
 
-  Future<Map<String, String>> getAdvertisingInfo() async {
-    return <String, String>{};
+  /// Returns advertising info (currently disabled for performance and stability)
+  /// Made synchronous since it always returns empty map
+  Map<String, String> getAdvertisingInfo() {
+    return const {};
 
     // We are removing this block because since April 1 2022 it started crashing
     // on some Android Devices when it was trying to get the advertisingId

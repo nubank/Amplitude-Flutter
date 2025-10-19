@@ -20,8 +20,8 @@ void main() {
 
       when(() => deviceInfo.getPlatformInfo()).thenAnswer(
           (_) => Future<Map<String, String>>.value({'platform': 'iOS'}));
-      when(() => deviceInfo.getAdvertisingInfo()).thenAnswer(
-          (_) => Future<Map<String, String>>.value(<String, String>{}));
+      when(() => deviceInfo.getAdvertisingInfo())
+          .thenReturn(<String, String>{});
       when(() => session.getSessionId()).thenAnswer((_) => 'session-123');
 
       client.reset();

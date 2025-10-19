@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 const MethodChannel _channel = MethodChannel('amplitude_flutter');
@@ -8,7 +9,7 @@ Future<String?> get getDeviceCarrierName async {
     final String? carrierName = await _channel.invokeMethod('carrierName');
     return carrierName;
   } on PlatformException catch (e) {
-    print('error retreiving carrier info: ${e.message}');
+    debugPrint('Amplitude: Error retrieving carrier info: ${e.message}');
     return '';
   }
 }

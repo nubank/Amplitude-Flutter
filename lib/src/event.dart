@@ -27,7 +27,7 @@ class Event {
       timestamp: timestamp,
       id: id,
       props: props,
-    )..uuid = const Uuid().v4();
+    )..uuid = _uuidGenerator.v4();
   }
 
   /// Factory method that creates an Event without a UUID
@@ -47,6 +47,17 @@ class Event {
     );
   }
 
+  /// Static UUID generator instance for better performance
+  /// Reusing a single instance avoids creating new Uuid() objects on every event
+  static const _uuidGenerator = Uuid();
+
+  /// Static library info map for better performance
+  /// Reusing a const map avoids creating new maps on every event
+  static const _libraryInfo = {
+    'name': Constants.packageName,
+    'version': Constants.packageVersion,
+  };
+
   int? id;
   String? sessionId;
   int? timestamp;
@@ -65,16 +76,15 @@ class Event {
   }
 
   Map<String, dynamic> toPayload() {
-    return <String, dynamic>{
+    final payload = <String, dynamic>{
       'event_id': id,
       'event_type': name,
       'session_id': sessionId,
       'timestamp': timestamp,
       'uuid': uuid,
-      'library': {
-        'name': Constants.packageName,
-        'version': Constants.packageVersion,
-      },
-    }..addAll(props);
+      'library': _libraryInfo,
+    };
+    payload.addAll(props);
+    return payload;
   }
 }

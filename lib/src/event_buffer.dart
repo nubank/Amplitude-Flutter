@@ -14,11 +14,6 @@ class EventBuffer {
   EventBuffer(this.provider, this.config) {
     client = provider.client;
     store = provider.store;
-
-    _flushTimer = Timer.periodic(
-      Duration(seconds: config.flushPeriod),
-      (Timer _t) => flush(),
-    );
   }
 
   final Config config;
@@ -33,15 +28,39 @@ class EventBuffer {
   /// Returns number of events in buffer
   int get length => store?.length ?? 0;
 
+  /// Schedules a periodic timer to flush the buffer
+  void _scheduleFlushTimer() {
+    if (_flushTimer != null) {
+      return;
+    }
+
+    _flushTimer = Timer.periodic(
+      Duration(seconds: config.flushPeriod),
+      (Timer timer) {
+        if (length > 0) {
+          flush();
+        } else {
+          /// Stop timer when buffer is empty to save battery
+          timer.cancel();
+          _flushTimer = null;
+        }
+      },
+    );
+  }
+
   /// Adds a raw event hash to the buffer
   Future<void> add(Event event) async {
     if (length >= config.maxStoredEvents) {
-      print('Max stored events reached.  Drop first event');
+      debugPrint('Amplitude: Max stored events reached. Drop first event');
       await store!.drop(1);
     }
 
     event.timestamp = currentTime();
     await store!.add(event);
+
+    if (length == 1) {
+      _scheduleFlushTimer();
+    }
 
     if (length >= config.bufferSize) {
       await flush();
@@ -49,22 +68,30 @@ class EventBuffer {
   }
 
   /// Adds many raw event hash to the buffer
-  Future<void> addAll(List<Event> eventsList) {
+  Future<void> addAll(List<Event> eventsList) async {
     if (eventsList.isEmpty) {
-      return Future.value();
+      return;
     }
+
+    final previousLength = length;
 
     if (length + eventsList.length >= config.maxStoredEvents) {
       final dropCount = length + eventsList.length - config.maxStoredEvents;
-      print('Max stored events reached.  Drop first $dropCount events');
-      store!.drop(dropCount);
+      debugPrint(
+          'Amplitude: Max stored events reached. Drop first $dropCount events');
+      await store!.drop(dropCount);
     }
 
-    final events = eventsList.map((e) {
-      e.timestamp = currentTime();
-      return e;
-    }).toList();
-    return store!.addAll(events);
+    final timestamp = currentTime();
+    for (final event in eventsList) {
+      event.timestamp = timestamp;
+    }
+    await store!.addAll(eventsList);
+
+    /// Start timer when first events are added
+    if (previousLength == 0 && length > 0) {
+      _scheduleFlushTimer();
+    }
   }
 
   /// Flushes all events in buffer

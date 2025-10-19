@@ -64,7 +64,7 @@ class AmplitudeFlutter {
             sessionId: session.getSessionId(), props: properties);
 
     final Map<String, String> advertisingValues =
-        _cachedAdvertisingInfo ?? await deviceInfo.getAdvertisingInfo();
+        _cachedAdvertisingInfo ?? deviceInfo.getAdvertisingInfo();
     event.addProps(<String, dynamic>{'api_properties': advertisingValues});
 
     final platformInfo =
@@ -84,34 +84,44 @@ class AmplitudeFlutter {
       return;
     }
 
-    final List<Event> eventsList = events
-        .map(
-          (Map<String, dynamic> event) => enableUuid
-              ? Event.uuid(
-                  event['name'],
-                  sessionId: session.getSessionId(),
-                  props: event['properties'],
-                )
-              : Event.noUuid(
-                  event['name'],
-                  sessionId: session.getSessionId(),
-                  props: event['properties'],
-                ),
-        )
-        .toList();
-
+    // Optimized: Pre-fetch common properties once
     final Map<String, String> advertisingValues =
-        _cachedAdvertisingInfo ?? await deviceInfo.getAdvertisingInfo();
+        _cachedAdvertisingInfo ?? deviceInfo.getAdvertisingInfo();
     final platformInfo =
         _cachedPlatformInfo ?? await deviceInfo.getPlatformInfo();
+    final sessionId = session.getSessionId();
 
-    for (final Event event in eventsList) {
-      event.addProps(<String, dynamic>{'api_properties': advertisingValues});
-      event.addProps(platformInfo);
-      if (userId != null) {
-        event.addProp('user_id', userId);
-      }
+    // Optimized: Build common properties map once
+    final commonProps = <String, dynamic>{
+      'api_properties': advertisingValues,
+      ...?platformInfo,
+    };
+    if (userId != null) {
+      commonProps['user_id'] = userId;
     }
+
+    // Optimized: Create events with properties in single pass
+    final eventsList = List<Event>.generate(
+      events.length,
+      (i) {
+        final eventData = events[i];
+        final event = enableUuid
+            ? Event.uuid(
+                eventData['name'],
+                sessionId: sessionId,
+                props: eventData['properties'],
+              )
+            : Event.noUuid(
+                eventData['name'],
+                sessionId: sessionId,
+                props: eventData['properties'],
+              );
+        event.addProps(commonProps);
+        return event;
+      },
+      growable: false,
+    );
+
     return buffer.addAll(eventsList);
   }
 
@@ -170,7 +180,7 @@ class AmplitudeFlutter {
 
   /// Pre-load and cache device info to avoid repeated async calls
   Future<void> _loadDeviceInfo() async {
-    _cachedAdvertisingInfo = await deviceInfo.getAdvertisingInfo();
+    _cachedAdvertisingInfo = deviceInfo.getAdvertisingInfo();
     _cachedPlatformInfo = await deviceInfo.getPlatformInfo();
   }
 }
