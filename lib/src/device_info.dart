@@ -15,9 +15,10 @@ class DeviceInfo {
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   Map<String, String?>? _deviceData = <String, String>{};
   final Map<String, String> _advData = <String, String>{};
+  bool _isInitialized = false;
 
   Future<Map<String, String?>?> getPlatformInfo() async {
-    if (_deviceData!.isNotEmpty) {
+    if (_isInitialized && _deviceData!.isNotEmpty) {
       return _deviceData;
     }
 
@@ -38,6 +39,7 @@ class DeviceInfo {
       // error
     }
     _deviceData = deviceData;
+    _isInitialized = true;
     return deviceData;
   }
 
@@ -89,6 +91,7 @@ class DeviceInfo {
   Future<void> regenerateDeviceId() async {
     await MetadataStore().setDeviceId(const Uuid().v4() + 'R');
     _deviceData = {};
+    _isInitialized = false;
   }
 
   Future<Map<String, String?>> _parseAndroidInfo(

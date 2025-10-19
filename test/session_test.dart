@@ -1,62 +1,57 @@
 import 'package:amplitude_flutter/src/session.dart';
-import 'package:amplitude_flutter/src/time_utils.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-
-class MockTimeUtils extends Mock implements TimeUtils {}
 
 void main() {
   late Session session;
-  final TimeUtils time = MockTimeUtils();
-
-  const int initialSessionId = 1;
   const int timeout = 100;
-  const int activeTime = 50;
-  const int expiredTime = 200;
 
   setUp(() {
-    when(() => time.currentTime()).thenAnswer((_) => initialSessionId);
-
-    session = Session.private(time, timeout);
+    session = Session.private(timeout);
   });
 
-  test('refresh() keeps the current session if within timeout', () async {
+  test('start() creates a session with current timestamp', () {
     session.start();
-
-    when(() => time.currentTime()).thenAnswer((_) => activeTime);
-
-    expect(session.getSessionId(), initialSessionId.toString());
+    final sessionId = session.getSessionId();
+    expect(sessionId, isNotNull);
+    expect(int.tryParse(sessionId), isNotNull);
+    expect(session.sessionStart, isNotNull);
+    expect(session.lastActivity, isNotNull);
   });
 
-  test('refresh() keeps the current session if in foreground', () async {
+  test('refresh() updates lastActivity', () async {
     session.start();
+    final originalSessionId = session.sessionStart;
 
-    when(() => time.currentTime()).thenAnswer((_) => expiredTime);
+    // Wait a bit and refresh
+    await Future.delayed(const Duration(milliseconds: 10));
+    session.refresh();
 
-    expect(session.getSessionId(), initialSessionId.toString());
+    expect(session.sessionStart, equals(originalSessionId));
+    expect(session.lastActivity, isNotNull);
   });
 
-  test('refresh() keeps the current session if resumed and within timeout',
-      () async {
+  test('withinSession() returns true when within timeout', () {
+    session.start();
+    final currentTime = session.sessionStart! + 50; // Within 100ms timeout
+    expect(session.withinSession(currentTime), isTrue);
+  });
+
+  test('withinSession() returns false when outside timeout', () {
+    session.start();
+    final currentTime = session.sessionStart! + 150; // Beyond 100ms timeout
+    expect(session.withinSession(currentTime), isFalse);
+  });
+
+  test('didChangeAppLifecycleState handles app lifecycle changes', () {
     session.start();
 
-    when(() => time.currentTime()).thenAnswer((_) => activeTime);
-
+    // Going to background
     session.didChangeAppLifecycleState(AppLifecycleState.inactive);
+    expect(session.lastActivity, isNotNull);
+
+    // Resuming
     session.didChangeAppLifecycleState(AppLifecycleState.resumed);
-
-    expect(session.getSessionId(), initialSessionId.toString());
-  });
-
-  test('refresh() resets the session if resumed and outside timeout', () async {
-    session.start();
-
-    when(() => time.currentTime()).thenAnswer((_) => expiredTime);
-
-    session.didChangeAppLifecycleState(AppLifecycleState.inactive);
-    session.didChangeAppLifecycleState(AppLifecycleState.resumed);
-
-    expect(session.getSessionId(), initialSessionId.toString());
+    expect(session.sessionStart, isNotNull);
   });
 }

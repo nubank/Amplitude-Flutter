@@ -12,25 +12,45 @@ class Session with WidgetsBindingObserver {
   }
 
   Session._internal(this.timeout) {
-    _time = TimeUtils();
     final widgetsBinding = WidgetsBinding.instance;
     widgetsBinding.addObserver(this);
   }
 
   @visibleForTesting
-  Session.private(TimeUtils time, this.timeout) {
-    _time = time;
-  }
+  Session.private(this.timeout);
 
   static Session? _instance;
-  late TimeUtils _time;
 
   int timeout;
   int? sessionStart;
   int? lastActivity;
-  
+
   void start() {
-    sessionStart = _time.currentTime();
+    sessionStart = currentTime();
+    lastActivity = sessionStart;
+  }
+
+  void refresh() {
+    final int now = currentTime();
+    if (!withinSession(now)) {
+      sessionStart = now;
+    }
+    lastActivity = now;
+  }
+
+  bool withinSession(int timestamp) {
+    if (sessionStart == null) {
+      return false;
+    }
+    return timestamp - sessionStart! < timeout;
+  }
+
+  void enterBackground() {
+    // Track when app goes to background
+  }
+
+  void exitBackground() {
+    // Track when app returns from background
   }
 
   String getSessionId() {
@@ -43,8 +63,12 @@ class Session with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
+        enterBackground();
+        lastActivity = currentTime();
         break;
       case AppLifecycleState.resumed:
+        refresh();
+        exitBackground();
         break;
       default:
     }

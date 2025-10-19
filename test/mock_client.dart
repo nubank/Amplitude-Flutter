@@ -1,7 +1,7 @@
 import 'package:amplitude_flutter/src/client.dart';
 
 class MockClient implements Client {
-  MockClient({this.httpStatus: 200});
+  MockClient({this.httpStatus = 200});
 
   @override
   late String apiKey;

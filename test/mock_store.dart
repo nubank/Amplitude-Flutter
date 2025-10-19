@@ -22,7 +22,7 @@ class MockStore implements Store {
   Future<void> delete(List<int?> eventIds) async {
     final int originalLength = db.length;
     db.removeWhere((Event event) => eventIds.contains(event.id));
-    length -= (originalLength - db.length);
+    length -= originalLength - db.length;
   }
 
   @override

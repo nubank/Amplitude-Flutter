@@ -9,7 +9,8 @@ void main() {
 
   // Register the mock handler.
   setUpAll(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
       switch (methodCall.method) {
         case 'carrierName':
           return 'AT&T';
@@ -22,7 +23,8 @@ void main() {
   });
 
   tearDownAll(() {
-    channel.setMockMethodCallHandler(null);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
   });
 
   test('amplitude_flutter channel is setup with carrierName method', () async {

@@ -14,9 +14,8 @@ class EventBuffer {
   EventBuffer(this.provider, this.config) {
     client = provider.client;
     store = provider.store;
-    flushInProgress = false;
 
-    Timer.periodic(
+    _flushTimer = Timer.periodic(
       Duration(seconds: config.flushPeriod),
       (Timer _t) => flush(),
     );
@@ -27,7 +26,8 @@ class EventBuffer {
   Client? client;
   Store? store;
 
-  late bool flushInProgress;
+  Future<void>? _flushFuture;
+  Timer? _flushTimer;
   int? numEvents;
 
   /// Returns number of events in buffer
@@ -40,7 +40,7 @@ class EventBuffer {
       await store!.drop(1);
     }
 
-    event.timestamp = TimeUtils().currentTime();
+    event.timestamp = currentTime();
     await store!.add(event);
 
     if (length >= config.bufferSize) {
@@ -51,7 +51,7 @@ class EventBuffer {
   /// Adds many raw event hash to the buffer
   Future<void> addAll(List<Event> eventsList) {
     if (eventsList.isEmpty) {
-      return Future.value(null);
+      return Future.value();
     }
 
     if (length + eventsList.length >= config.maxStoredEvents) {
@@ -61,7 +61,7 @@ class EventBuffer {
     }
 
     final events = eventsList.map((e) {
-      e.timestamp = TimeUtils().currentTime();
+      e.timestamp = currentTime();
       return e;
     }).toList();
     return store!.addAll(events);
@@ -69,11 +69,22 @@ class EventBuffer {
 
   /// Flushes all events in buffer
   Future<void> flush() async {
-    if (length < 1 || flushInProgress) {
+    if (_flushFuture != null) {
+      return _flushFuture;
+    }
+    if (length < 1) {
       return;
     }
 
-    flushInProgress = true;
+    _flushFuture = _performFlush();
+    try {
+      await _flushFuture;
+    } finally {
+      _flushFuture = null;
+    }
+  }
+
+  Future<void> _performFlush() async {
     numEvents ??= length;
     final events = await fetch(numEvents!);
     final List<Map<String, dynamic>> payload =
@@ -91,7 +102,6 @@ class EventBuffer {
       default:
       // error
     }
-    flushInProgress = false;
   }
 
   @visibleForTesting
@@ -114,5 +124,10 @@ class EventBuffer {
   Future<void> _deleteEvents(List<int?> eventIds) async {
     await store!.delete(eventIds);
     numEvents = null;
+  }
+
+  void dispose() {
+    _flushTimer?.cancel();
+    _flushTimer = null;
   }
 }

@@ -34,6 +34,12 @@ class AmplitudeFlutter {
   late EventBuffer buffer;
   dynamic userId;
 
+  /// Cached device info to avoid repeated async calls
+  Map<String, String>? _cachedAdvertisingInfo;
+
+  /// Cached platform info to avoid repeated async calls
+  Map<String, String?>? _cachedPlatformInfo;
+
   void setSessionId(int sessionId) {
     session!.sessionStart = sessionId;
   }
@@ -48,7 +54,7 @@ class AmplitudeFlutter {
       {required String name,
       Map<String, dynamic> properties = const <String, String>{}}) async {
     if (config!.optOut) {
-      return Future.value(null);
+      return;
     }
 
     final Event event = enableUuid
@@ -58,9 +64,12 @@ class AmplitudeFlutter {
             sessionId: session!.getSessionId(), props: properties);
 
     final Map<String, String> advertisingValues =
-        await deviceInfo!.getAdvertisingInfo();
+        _cachedAdvertisingInfo ?? await deviceInfo!.getAdvertisingInfo();
     event.addProps(<String, dynamic>{'api_properties': advertisingValues});
-    event.addProps(await deviceInfo!.getPlatformInfo());
+
+    final platformInfo =
+        _cachedPlatformInfo ?? await deviceInfo!.getPlatformInfo();
+    event.addProps(platformInfo);
 
     if (userId != null) {
       event.addProp('user_id', userId);
@@ -72,7 +81,7 @@ class AmplitudeFlutter {
   /// Log many events
   Future<void> logBulkEvent(List<Map<String, dynamic>> events) async {
     if (config!.optOut) {
-      return Future.value(null);
+      return;
     }
 
     final List<Event> eventsList = events
@@ -92,8 +101,9 @@ class AmplitudeFlutter {
         .toList();
 
     final Map<String, String> advertisingValues =
-        await deviceInfo!.getAdvertisingInfo();
-    final platformInfo = await deviceInfo!.getPlatformInfo();
+        _cachedAdvertisingInfo ?? await deviceInfo!.getAdvertisingInfo();
+    final platformInfo =
+        _cachedPlatformInfo ?? await deviceInfo!.getPlatformInfo();
 
     for (final Event event in eventsList) {
       event.addProps(<String, dynamic>{'api_properties': advertisingValues});
@@ -143,6 +153,11 @@ class AmplitudeFlutter {
   /// Manually flush events in the buffer
   Future<void> flushEvents() => buffer.flush();
 
+  /// Dispose resources
+  void dispose() {
+    buffer.dispose();
+  }
+
   void _init() {
     enableUuid = config!.enableUuid;
     deviceInfo = provider!.deviceInfo;
@@ -150,5 +165,12 @@ class AmplitudeFlutter {
     buffer = EventBuffer(provider!, config!);
 
     session!.start();
+    _loadDeviceInfo();
+  }
+
+  /// Pre-load and cache device info to avoid repeated async calls
+  Future<void> _loadDeviceInfo() async {
+    _cachedAdvertisingInfo = await deviceInfo!.getAdvertisingInfo();
+    _cachedPlatformInfo = await deviceInfo!.getPlatformInfo();
   }
 }
