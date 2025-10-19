@@ -91,7 +91,6 @@ void main() {
           final event = Event.uuid('test');
           final originalUuid = event.uuid;
 
-          // Perform various operations
           event.addProp('newProp', 'newValue');
           event.addProps({'anotherProp': 'anotherValue'});
           final payload1 = event.toPayload();

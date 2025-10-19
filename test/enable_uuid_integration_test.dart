@@ -62,7 +62,7 @@ void main() {
       test(
           'Default Config() -> AmplitudeFlutter -> logEvent includes UUID by default',
           () async {
-        final config = Config(); // Default should have enableUuid: true
+        final config = Config();
         final amplitude = AmplitudeFlutter.private(provider, config);
 
         await amplitude.logEvent(name: 'test_event');
@@ -84,10 +84,10 @@ void main() {
         final amplitudeWithoutUuid =
             AmplitudeFlutter.private(provider, configWithoutUuid);
 
-        expect(amplitudeWithUuid.config!.enableUuid, isTrue);
+        expect(amplitudeWithUuid.config.enableUuid, isTrue);
         expect(amplitudeWithUuid.enableUuid, isTrue);
 
-        expect(amplitudeWithoutUuid.config!.enableUuid, isFalse);
+        expect(amplitudeWithoutUuid.config.enableUuid, isFalse);
         expect(amplitudeWithoutUuid.enableUuid, isFalse);
       });
     });
@@ -98,7 +98,6 @@ void main() {
         final amplitude =
             AmplitudeFlutter.private(provider, Config(enableUuid: true));
 
-        // Log multiple events
         await amplitude.logEvent(name: 'event1');
         await amplitude.logEvent(name: 'event2');
         await amplitude.identify(Identify()..set('prop', 'value'));
@@ -117,7 +116,6 @@ void main() {
           expect(event['uuid'], matches(uuidRegex));
         }
 
-        // All UUIDs should be unique
         final uuids = client.postCalls.single.map((e) => e['uuid']).toList();
         expect(uuids.toSet().length, equals(4));
       });
@@ -157,7 +155,6 @@ void main() {
       test(
           'Changing enableUuid between AmplitudeFlutter instances works correctly',
           () async {
-        // First instance with UUID enabled
         final amplitude1 =
             AmplitudeFlutter.private(provider, Config(enableUuid: true));
         await amplitude1.logEvent(name: 'event_with_uuid');
@@ -165,7 +162,6 @@ void main() {
 
         client.reset();
 
-        // Second instance with UUID disabled
         final amplitude2 =
             AmplitudeFlutter.private(provider, Config(enableUuid: false));
         await amplitude2.logEvent(name: 'event_without_uuid');
@@ -182,7 +178,6 @@ void main() {
         final amplitudeWithoutUuid = AmplitudeFlutter.private(
             provider, Config(enableUuid: false, optOut: true));
 
-        // Both should not log events when opted out
         await amplitudeWithUuid.logEvent(name: 'test');
         await amplitudeWithoutUuid.logEvent(name: 'test');
         await amplitudeWithUuid.flushEvents();
@@ -212,17 +207,14 @@ void main() {
 
         expect(client.postCalls.single, hasLength(100));
 
-        // All events should have UUIDs
         for (final event in client.postCalls.single) {
           expect(event['uuid'], isNotNull);
         }
 
-        // All UUIDs should be unique
         final uuids = client.postCalls.single.map((e) => e['uuid']).toSet();
         expect(uuids.length, equals(100));
 
-        // Performance check - should complete within reasonable time
-        expect(stopwatch.elapsedMilliseconds, lessThan(5000)); // 5 seconds max
+        expect(stopwatch.elapsedMilliseconds, lessThan(5000));
       });
     });
   });

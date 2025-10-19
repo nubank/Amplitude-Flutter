@@ -11,7 +11,6 @@ void main() {
 
     group('enableUuid propagation to Store', () {
       test('creates Store with enableUuid=true when specified', () {
-        // Create a custom store to avoid singleton conflicts
         final customStore = MockStore();
         customStore.enableUuid = true;
 
@@ -24,11 +23,10 @@ void main() {
         );
 
         expect(provider.store, isNotNull);
-        expect(provider.store!.enableUuid, isTrue);
+        expect(provider.store.enableUuid, isTrue);
       });
 
       test('creates Store with enableUuid=false when specified', () {
-        // Create a custom store to avoid singleton conflicts
         final customStore = MockStore();
         customStore.enableUuid = false;
 
@@ -41,7 +39,7 @@ void main() {
         );
 
         expect(provider.store, isNotNull);
-        expect(provider.store!.enableUuid, isFalse);
+        expect(provider.store.enableUuid, isFalse);
       });
 
       test('uses provided Store instance when given', () {
@@ -52,13 +50,12 @@ void main() {
           apiKey: 'test-api-key',
           timeout: 30000,
           getCarrierInfo: false,
-          enableUuid: true, // This should be ignored when store is provided
+          enableUuid: true,
           store: mockStore,
         );
 
         expect(provider.store, equals(mockStore));
-        expect(provider.store!.enableUuid,
-            isFalse); // Uses the provided store's setting
+        expect(provider.store.enableUuid, isFalse);
       });
     });
 
@@ -79,7 +76,7 @@ void main() {
         expect(provider.deviceInfo, isNotNull);
         expect(provider.session, isNotNull);
         expect(provider.store, isNotNull);
-        expect(provider.store!.enableUuid, isTrue);
+        expect(provider.store.enableUuid, isTrue);
       });
 
       test('initializes all components correctly with enableUuid=false', () {
@@ -98,7 +95,7 @@ void main() {
         expect(provider.deviceInfo, isNotNull);
         expect(provider.session, isNotNull);
         expect(provider.store, isNotNull);
-        expect(provider.store!.enableUuid, isFalse);
+        expect(provider.store.enableUuid, isFalse);
       });
     });
 
@@ -127,8 +124,8 @@ void main() {
 
         expect(provider1.store, isNotNull);
         expect(provider2.store, isNotNull);
-        expect(provider1.store!.enableUuid, isTrue);
-        expect(provider2.store!.enableUuid, isFalse);
+        expect(provider1.store.enableUuid, isTrue);
+        expect(provider2.store.enableUuid, isFalse);
       });
 
       test('respects provided Store instance', () {
@@ -139,12 +136,12 @@ void main() {
           apiKey: 'test-api-key',
           timeout: 30000,
           getCarrierInfo: false,
-          enableUuid: false, // This should be ignored
+          enableUuid: false,
           store: customStore,
         );
 
         expect(provider.store, equals(customStore));
-        expect(provider.store!.enableUuid, isTrue);
+        expect(provider.store.enableUuid, isTrue);
       });
     });
 
@@ -172,7 +169,6 @@ void main() {
           store: storeWithoutUuid,
         );
 
-        // Both should have all components initialized
         expect(providerWithUuid.client, isNotNull);
         expect(providerWithUuid.deviceInfo, isNotNull);
         expect(providerWithUuid.session, isNotNull);

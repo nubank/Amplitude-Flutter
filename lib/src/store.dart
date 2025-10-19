@@ -5,17 +5,17 @@ import 'package:sqflite/sqflite.dart';
 
 import 'event.dart';
 
-const String EVENTS_TABLE = 'events';
-const String COL_ID = 'id';
-const String COL_EVENT_TYPE = 'event_type';
-const String COL_TIMESTAMP = 'timestamp';
-const String COL_SESSION_ID = 'session_id';
-const String COL_PROPS = 'props_json';
-const String DEFAULT_DB_NAME = 'amp.db';
+const String eventsTable = 'events';
+const String colId = 'id';
+const String colEventType = 'event_type';
+const String colTimestamp = 'timestamp';
+const String colSessionId = 'session_id';
+const String colProps = 'props_json';
+const String defaultDbName = 'amp.db';
 
 class Store {
   factory Store({
-    String dbFile = DEFAULT_DB_NAME,
+    String dbFile = defaultDbName,
     bool enableUuid = true,
   }) =>
       _instances.putIfAbsent(dbFile, () => Store._(dbFile, enableUuid));
@@ -37,7 +37,7 @@ class Store {
     }
 
     try {
-      final result = await db.insert(EVENTS_TABLE, _serialize(event));
+      final result = await db.insert(eventsTable, _serialize(event));
       length++;
       return result;
     } catch (ex) {
@@ -54,7 +54,7 @@ class Store {
     try {
       final batch = db.batch();
       for (final event in events) {
-        batch.insert(EVENTS_TABLE, _serialize(event));
+        batch.insert(eventsTable, _serialize(event));
         length++;
       }
       return await batch.commit(noResult: true);
@@ -70,7 +70,7 @@ class Store {
     }
 
     try {
-      await db.rawDelete('DELETE FROM $EVENTS_TABLE; VACUUM;');
+      await db.rawDelete('DELETE FROM $eventsTable; VACUUM;');
       length = 0;
     } catch (ex) {
       return;
@@ -90,7 +90,7 @@ class Store {
 
     try {
       final resultCount = await db.rawDelete(
-          'DELETE FROM $EVENTS_TABLE WHERE $COL_ID IN (SELECT T2.$COL_ID FROM $EVENTS_TABLE T2 ORDER BY T2.$COL_ID LIMIT $count)');
+          'DELETE FROM $eventsTable WHERE $colId IN (SELECT T2.$colId FROM $eventsTable T2 ORDER BY T2.$colId LIMIT $count)');
       length -= resultCount;
     } catch (ex) {
       return;
@@ -105,7 +105,7 @@ class Store {
 
     try {
       final count = await db.rawDelete(
-          'DELETE FROM $EVENTS_TABLE WHERE id IN (${eventIds.join(',')})');
+          'DELETE FROM $eventsTable WHERE id IN (${eventIds.join(',')})');
       length -= count;
     } catch (ex) {
       return;
@@ -120,7 +120,7 @@ class Store {
 
     try {
       final records =
-          await db.query(EVENTS_TABLE, limit: count, orderBy: COL_ID);
+          await db.query(eventsTable, limit: count, orderBy: colId);
       return records.map((m) => _deserialize(m)).toList();
     } catch (ex) {
       return [];
@@ -148,12 +148,12 @@ class Store {
 
       final createDb = (Database db, int version) async {
         await db.execute('''
-          create table $EVENTS_TABLE (
-            $COL_ID integer primary key autoincrement,
-            $COL_EVENT_TYPE text not null,
-            $COL_SESSION_ID text,
-            $COL_TIMESTAMP integer,
-            $COL_PROPS text
+          create table $eventsTable (
+            $colId integer primary key autoincrement,
+            $colEventType text not null,
+            $colSessionId text,
+            $colTimestamp integer,
+            $colProps text
           )
         ''');
       };
@@ -170,30 +170,29 @@ class Store {
     }
     try {
       final List<Map<String, dynamic>> rows =
-          await db.rawQuery('SELECT COUNT(*) as count FROM $EVENTS_TABLE');
+          await db.rawQuery('SELECT COUNT(*) as count FROM $eventsTable');
       return rows.single['count'];
     } catch (e) {
       return 0;
     }
   }
 
-  Map<String, dynamic> _serialize(Event e) {
-    return <String, dynamic>{}
-      ..[COL_EVENT_TYPE] = e.name
-      ..[COL_SESSION_ID] = e.sessionId
-      ..[COL_TIMESTAMP] = e.timestamp
-      ..[COL_PROPS] = json.encode(e.props);
-  }
+  Map<String, dynamic> _serialize(Event e) => {
+        colEventType: e.name,
+        colSessionId: e.sessionId,
+        colTimestamp: e.timestamp,
+        colProps: json.encode(e.props),
+      };
 
   Event _deserialize(Map<String, dynamic> map) => enableUuid
-      ? Event.uuid(map[COL_EVENT_TYPE],
-          sessionId: map[COL_SESSION_ID],
-          timestamp: map[COL_TIMESTAMP],
-          id: map[COL_ID],
-          props: json.decode(map[COL_PROPS]))
-      : Event.noUuid(map[COL_EVENT_TYPE],
-          sessionId: map[COL_SESSION_ID],
-          timestamp: map[COL_TIMESTAMP],
-          id: map[COL_ID],
-          props: json.decode(map[COL_PROPS]));
+      ? Event.uuid(map[colEventType],
+          sessionId: map[colSessionId],
+          timestamp: map[colTimestamp],
+          id: map[colId],
+          props: json.decode(map[colProps]))
+      : Event.noUuid(map[colEventType],
+          sessionId: map[colSessionId],
+          timestamp: map[colTimestamp],
+          id: map[colId],
+          props: json.decode(map[colProps]));
 }

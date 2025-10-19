@@ -72,8 +72,8 @@ void main() {
       });
 
       test('combining multiple operations', () {
-        subject
-          !..set('cohort', 'Test A')
+        subject!
+          ..set('cohort', 'Test A')
           ..setOnce('completed_onboarding', 'true')
           ..add('login_count', 1)
           ..append('tags', 'new tag')
@@ -102,8 +102,8 @@ void main() {
       });
 
       test(r'adds multiple properties for an operation', () {
-        subject
-          !..addOp(op, 'cohort', 'Test A')
+        subject!
+          ..addOp(op, 'cohort', 'Test A')
           ..addOp(op, 'interests', ['chess', 'football']);
 
         expect(
@@ -115,7 +115,9 @@ void main() {
       });
 
       test(r'overwrites entries with the same key for a given operation', () {
-        subject!..addOp(op, 'cohort', 'Test A')..addOp(op, 'cohort', 'Test B');
+        subject!
+          ..addOp(op, 'cohort', 'Test A')
+          ..addOp(op, 'cohort', 'Test B');
 
         expect(subject!.payload, containsPair(op, {'cohort': 'Test B'}));
       });

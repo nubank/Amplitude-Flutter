@@ -4,20 +4,19 @@ import 'session.dart';
 import 'store.dart';
 
 class ServiceProvider {
-  ServiceProvider(
-      {required String apiKey,
-      required int timeout,
-      required bool getCarrierInfo,
-      bool enableUuid = true,
-      this.store}) {
-    client = Client(apiKey);
-    deviceInfo = DeviceInfo(getCarrierInfo);
-    session = Session(timeout);
-    store ??= Store(enableUuid: enableUuid);
-  }
+  ServiceProvider({
+    required String apiKey,
+    required int timeout,
+    required bool getCarrierInfo,
+    bool enableUuid = true,
+    Store? store,
+  })  : client = Client(apiKey),
+        deviceInfo = DeviceInfo(getCarrierInfo),
+        session = Session(timeout),
+        store = store ?? Store(enableUuid: enableUuid);
 
-  Client? client;
-  Store? store;
-  Session? session;
-  DeviceInfo? deviceInfo;
+  final Client client;
+  final Store store;
+  final Session session;
+  final DeviceInfo deviceInfo;
 }

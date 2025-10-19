@@ -13,19 +13,18 @@ class MockDeviceInfo extends Mock implements DeviceInfo {}
 class MockSession extends Mock implements Session {}
 
 class MockServiceProvider implements ServiceProvider {
-  MockServiceProvider({this.client, this.store}) {
-    client ??= MockClient();
-    store ??= MockStore();
-    session = MockSession();
-    deviceInfo = MockDeviceInfo();
-  }
+  MockServiceProvider({Client? client, Store? store})
+      : client = client ?? MockClient(),
+        store = store ?? MockStore(),
+        session = MockSession(),
+        deviceInfo = MockDeviceInfo();
 
   @override
-  Client? client;
+  final Client client;
   @override
-  Store? store;
+  final Store store;
   @override
-  Session? session;
+  final Session session;
   @override
-  DeviceInfo? deviceInfo;
+  final DeviceInfo deviceInfo;
 }

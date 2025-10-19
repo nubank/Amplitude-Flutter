@@ -10,14 +10,14 @@ import 'service_provider.dart';
 import 'session.dart';
 
 class AmplitudeFlutter {
-  AmplitudeFlutter(String apiKey, [this.config]) {
-    config ??= Config();
-    provider = ServiceProvider(
-      apiKey: apiKey,
-      timeout: config!.sessionTimeout,
-      getCarrierInfo: config!.getCarrierInfo,
-      enableUuid: config!.enableUuid,
-    );
+  AmplitudeFlutter(String apiKey, [Config? config])
+      : config = config ?? Config(),
+        provider = ServiceProvider(
+          apiKey: apiKey,
+          timeout: (config ?? Config()).sessionTimeout,
+          getCarrierInfo: (config ?? Config()).getCarrierInfo,
+          enableUuid: (config ?? Config()).enableUuid,
+        ) {
     _init();
   }
 
@@ -26,12 +26,12 @@ class AmplitudeFlutter {
   }
 
   bool? getCarrierInfo;
-  late bool enableUuid;
-  Config? config;
-  ServiceProvider? provider;
-  DeviceInfo? deviceInfo;
-  Session? session;
-  late EventBuffer buffer;
+  late final bool enableUuid;
+  final Config config;
+  final ServiceProvider provider;
+  late final DeviceInfo deviceInfo;
+  late final Session session;
+  late final EventBuffer buffer;
   dynamic userId;
 
   /// Cached device info to avoid repeated async calls
@@ -41,7 +41,7 @@ class AmplitudeFlutter {
   Map<String, String?>? _cachedPlatformInfo;
 
   void setSessionId(int sessionId) {
-    session!.sessionStart = sessionId;
+    session.sessionStart = sessionId;
   }
 
   /// Set the user id associated with events
@@ -53,22 +53,22 @@ class AmplitudeFlutter {
   Future<void> logEvent(
       {required String name,
       Map<String, dynamic> properties = const <String, String>{}}) async {
-    if (config!.optOut) {
+    if (config.optOut) {
       return;
     }
 
     final Event event = enableUuid
         ? Event.uuid(name,
-            sessionId: session!.getSessionId(), props: properties)
+            sessionId: session.getSessionId(), props: properties)
         : Event.noUuid(name,
-            sessionId: session!.getSessionId(), props: properties);
+            sessionId: session.getSessionId(), props: properties);
 
     final Map<String, String> advertisingValues =
-        _cachedAdvertisingInfo ?? await deviceInfo!.getAdvertisingInfo();
+        _cachedAdvertisingInfo ?? await deviceInfo.getAdvertisingInfo();
     event.addProps(<String, dynamic>{'api_properties': advertisingValues});
 
     final platformInfo =
-        _cachedPlatformInfo ?? await deviceInfo!.getPlatformInfo();
+        _cachedPlatformInfo ?? await deviceInfo.getPlatformInfo();
     event.addProps(platformInfo);
 
     if (userId != null) {
@@ -80,7 +80,7 @@ class AmplitudeFlutter {
 
   /// Log many events
   Future<void> logBulkEvent(List<Map<String, dynamic>> events) async {
-    if (config!.optOut) {
+    if (config.optOut) {
       return;
     }
 
@@ -89,21 +89,21 @@ class AmplitudeFlutter {
           (Map<String, dynamic> event) => enableUuid
               ? Event.uuid(
                   event['name'],
-                  sessionId: session!.getSessionId(),
+                  sessionId: session.getSessionId(),
                   props: event['properties'],
                 )
               : Event.noUuid(
                   event['name'],
-                  sessionId: session!.getSessionId(),
+                  sessionId: session.getSessionId(),
                   props: event['properties'],
                 ),
         )
         .toList();
 
     final Map<String, String> advertisingValues =
-        _cachedAdvertisingInfo ?? await deviceInfo!.getAdvertisingInfo();
+        _cachedAdvertisingInfo ?? await deviceInfo.getAdvertisingInfo();
     final platformInfo =
-        _cachedPlatformInfo ?? await deviceInfo!.getPlatformInfo();
+        _cachedPlatformInfo ?? await deviceInfo.getPlatformInfo();
 
     for (final Event event in eventsList) {
       event.addProps(<String, dynamic>{'api_properties': advertisingValues});
@@ -145,7 +145,7 @@ class AmplitudeFlutter {
   Future<void> logRevenue(Revenue revenue) async {
     if (revenue.isValid()) {
       return logEvent(
-          name: Revenue.EVENT,
+          name: Revenue.event,
           properties: <String, dynamic>{'event_properties': revenue.payload});
     }
   }
@@ -159,18 +159,18 @@ class AmplitudeFlutter {
   }
 
   void _init() {
-    enableUuid = config!.enableUuid;
-    deviceInfo = provider!.deviceInfo;
-    session = provider!.session;
-    buffer = EventBuffer(provider!, config!);
+    enableUuid = config.enableUuid;
+    deviceInfo = provider.deviceInfo;
+    session = provider.session;
+    buffer = EventBuffer(provider, config);
 
-    session!.start();
+    session.start();
     _loadDeviceInfo();
   }
 
   /// Pre-load and cache device info to avoid repeated async calls
   Future<void> _loadDeviceInfo() async {
-    _cachedAdvertisingInfo = await deviceInfo!.getAdvertisingInfo();
-    _cachedPlatformInfo = await deviceInfo!.getPlatformInfo();
+    _cachedAdvertisingInfo = await deviceInfo.getAdvertisingInfo();
+    _cachedPlatformInfo = await deviceInfo.getPlatformInfo();
   }
 }

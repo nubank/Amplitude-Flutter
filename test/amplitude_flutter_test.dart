@@ -217,7 +217,6 @@ void main() {
         expect(client.postCalls.single.single['uuid'], isNotNull);
         expect(client.postCalls.single.single['uuid'], isA<String>());
 
-        // Verify UUID format (v4)
         final uuidRegex = RegExp(
             r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
             caseSensitive: false);
@@ -253,7 +252,6 @@ void main() {
           expect(event['uuid'], matches(uuidRegex));
         }
 
-        // Verify UUIDs are unique
         expect(client.postCalls.single[0]['uuid'],
             isNot(equals(client.postCalls.single[1]['uuid'])));
       });

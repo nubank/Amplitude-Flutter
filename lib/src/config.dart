@@ -17,8 +17,8 @@ class Config {
   final bool getCarrierInfo;
   final bool enableUuid;
 
-  static const defaultSessionTimeout = 300000;
+  static const defaultSessionTimeout = 300_000; // 5 minutes in milliseconds
   static const defaultBufferSize = 10;
-  static const defaultMaxStoredEvents = 1000;
+  static const defaultMaxStoredEvents = 1_000;
   static const defaultFlushPeriod = 30;
 }

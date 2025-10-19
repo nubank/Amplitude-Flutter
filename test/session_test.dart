@@ -23,7 +23,6 @@ void main() {
     session.start();
     final originalSessionId = session.sessionStart;
 
-    // Wait a bit and refresh
     await Future.delayed(const Duration(milliseconds: 10));
     session.refresh();
 
@@ -33,24 +32,22 @@ void main() {
 
   test('withinSession() returns true when within timeout', () {
     session.start();
-    final currentTime = session.sessionStart! + 50; // Within 100ms timeout
+    final currentTime = session.sessionStart! + 50;
     expect(session.withinSession(currentTime), isTrue);
   });
 
   test('withinSession() returns false when outside timeout', () {
     session.start();
-    final currentTime = session.sessionStart! + 150; // Beyond 100ms timeout
+    final currentTime = session.sessionStart! + 150;
     expect(session.withinSession(currentTime), isFalse);
   });
 
   test('didChangeAppLifecycleState handles app lifecycle changes', () {
     session.start();
 
-    // Going to background
     session.didChangeAppLifecycleState(AppLifecycleState.inactive);
     expect(session.lastActivity, isNotNull);
 
-    // Resuming
     session.didChangeAppLifecycleState(AppLifecycleState.resumed);
     expect(session.sessionStart, isNotNull);
   });

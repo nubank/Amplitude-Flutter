@@ -63,9 +63,6 @@ void main() {
       test('enableUuid is final and cannot be changed after creation', () {
         final config = Config(enableUuid: true);
         expect(config.enableUuid, isTrue);
-
-        // This should not compile if enableUuid is properly final
-        // config.enableUuid = false; // Would cause compilation error
       });
     });
 

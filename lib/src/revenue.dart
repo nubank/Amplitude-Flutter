@@ -1,40 +1,40 @@
 class Revenue {
   Revenue() {
-    payload = <String, dynamic>{QUANTITY: 1};
+    payload[quantity] = 1;
   }
 
-  Map<String, dynamic>? payload;
+  final Map<String, dynamic> payload = {};
 
-  static const EVENT = 'revenue_amount';
-  static const PRODUCT_ID = r'$productId';
-  static const PRICE = r'$price';
-  static const QUANTITY = r'$quantity';
-  static const REVENUE_TYPE = r'$revenueType';
-  static const RECEIPT = r'$receipt';
+  static const event = 'revenue_amount';
+  static const productId = r'$productId';
+  static const price = r'$price';
+  static const quantity = r'$quantity';
+  static const revenueType = r'$revenueType';
+  static const receipt = r'$receipt';
 
-  bool isValid() => payload![PRICE] != null;
+  bool isValid() => payload[price] != null;
 
   void setProductId(String productId) {
-    payload![PRODUCT_ID] = productId;
+    payload[Revenue.productId] = productId;
   }
 
   void setPrice(double price) {
-    payload![PRICE] = price;
+    payload[Revenue.price] = price;
   }
 
   void setQuantity(int quantity) {
-    payload![QUANTITY] = quantity;
+    payload[Revenue.quantity] = quantity;
   }
 
   void setRevenueType(String revenueType) {
-    payload![REVENUE_TYPE] = revenueType;
+    payload[Revenue.revenueType] = revenueType;
   }
 
   void setProperties(Map<String, dynamic> properties) {
-    payload!.addAll(properties);
+    payload.addAll(properties);
   }
 
   void setReceipt(String data) {
-    payload![RECEIPT] = data;
+    payload[Revenue.receipt] = data;
   }
 }

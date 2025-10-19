@@ -72,10 +72,10 @@ void main() {
       });
 
       test('limits number of events added to the store', () async {
-        // Have the client return an unhandled status code so the store doesn't get cleared
-        provider.client = MockClient(httpStatus: 218);
-        subject =
-            EventBuffer(provider, Config(bufferSize: 1, maxStoredEvents: 2));
+        final testProvider =
+            MockServiceProvider(client: MockClient(httpStatus: 218));
+        subject = EventBuffer(
+            testProvider, Config(bufferSize: 1, maxStoredEvents: 2));
 
         await subject.add(Event.uuid('test 1'));
         await subject.add(Event.uuid('test 2'));
@@ -104,10 +104,10 @@ void main() {
       });
 
       test('limits number of events added to the store', () async {
-        // Have the client return an unhandled status code so the store doesn't get cleared
-        provider.client = MockClient(httpStatus: 218);
+        final testProvider =
+            MockServiceProvider(client: MockClient(httpStatus: 218));
         subject = EventBuffer(
-            provider,
+            testProvider,
             Config(
               bufferSize: 1,
               maxStoredEvents: 3,
