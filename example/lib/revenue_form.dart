@@ -16,17 +16,20 @@ class _RevenueFormState extends State<RevenueForm> {
   final TextEditingController quantity = TextEditingController(text: '2');
 
   void onPress() {
+    final num? parsedPrice = num.tryParse(price.text);
+    final int? parsedQuantity = int.tryParse(quantity.text);
+
     if (productId.text.isNotEmpty &&
-        num.tryParse(price.text) != null &&
-        num.tryParse(quantity.text) != null) {
+        parsedPrice != null &&
+        parsedQuantity != null) {
       final Revenue revenue = Revenue()
         ..setProductId(productId.text)
-        ..setPrice(num.tryParse(price.text))
-        ..setQuantity(num.tryParse(quantity.text));
+        ..setPrice(parsedPrice.toDouble())
+        ..setQuantity(parsedQuantity);
 
-      AppState.of(context)
-        ..analytics.logRevenue(revenue)
-        ..setMessage('Revenue Sent.');
+      final AppState appState = AppState.of(context);
+      appState.analytics.logRevenue(revenue);
+      appState.setMessage('Revenue Sent.');
     }
   }
 

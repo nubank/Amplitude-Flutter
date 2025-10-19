@@ -22,7 +22,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _message = '';
-  AmplitudeFlutter analytics;
+  late AmplitudeFlutter analytics;
 
   @override
   void initState() {
@@ -30,6 +30,12 @@ class _MyAppState extends State<MyApp> {
     analytics = AmplitudeFlutter(
         widget.apiKey, Config(bufferSize: 8, getCarrierInfo: true));
     analytics.logEvent(name: 'MyApp startup');
+  }
+
+  @override
+  void dispose() {
+    analytics.dispose();
+    super.dispose();
   }
 
   Future<void> _flushEvents() async {

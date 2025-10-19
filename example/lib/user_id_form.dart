@@ -8,9 +8,9 @@ class UserIdForm extends StatefulWidget {
 }
 
 class _UserIdFormState extends State<UserIdForm> {
-  Function makeHandler(BuildContext context) {
+  void Function(String) makeHandler(BuildContext context) {
     return (String userId) {
-      AppState.of(context).analytics..setUserId(userId.isEmpty ? null : userId);
+      AppState.of(context).analytics.setUserId(userId.isEmpty ? null : userId);
     };
   }
 
@@ -18,7 +18,7 @@ class _UserIdFormState extends State<UserIdForm> {
   Widget build(BuildContext context) {
     return TextField(
         autocorrect: false,
-        decoration: InputDecoration(labelText: 'User Id'),
+        decoration: const InputDecoration(labelText: 'User Id'),
         onChanged: makeHandler(context));
   }
 }
