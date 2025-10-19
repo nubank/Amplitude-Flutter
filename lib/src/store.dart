@@ -30,7 +30,7 @@ class Store {
       _instances.putIfAbsent(dbFile, () => Store._(dbFile, enableUuid));
 
   Store._(this.dbFile, this.enableUuid) {
-    _init();
+    _dbFuture = _init();
   }
 
   bool enableUuid;
@@ -39,9 +39,12 @@ class Store {
   final String dbFile;
   int length = 0;
 
+  /// Cached Future for database initialization to avoid multiple awaits
+  late final Future<Database?> _dbFuture;
+
   /// Adds a raw event hash to the store
   Future<int> add(Event event) async {
-    final db = await _getDb();
+    final db = _db ?? await _getDb();
     if (db == null) {
       return 0;
     }
@@ -56,7 +59,7 @@ class Store {
 
   /// Adds multiple events to the store
   Future<List<Object?>> addAll(List<Event> events) async {
-    final db = await _getDb();
+    final db = _db ?? await _getDb();
     if (db == null) {
       return [];
     }
@@ -74,7 +77,7 @@ class Store {
 
   /// Empties the store
   Future<void> empty() async {
-    final db = await _getDb();
+    final db = _db ?? await _getDb();
     if (db == null) {
       return;
     }
@@ -88,13 +91,13 @@ class Store {
 
   /// Counts the number of events in the store
   Future<int?> count() async {
-    final db = await _getDb();
+    final db = _db ?? await _getDb();
     return _count(db);
   }
 
   /// Drops a specified number of events from the store
   Future<void> drop(int count) async {
-    final db = await _getDb();
+    final db = _db ?? await _getDb();
     if (db == null) {
       return;
     }
@@ -110,7 +113,7 @@ class Store {
 
   /// Deletes events with specified IDs from the store
   Future<void> delete(List<int?> eventIds) async {
-    final db = await _getDb();
+    final db = _db ?? await _getDb();
     if (db == null) {
       return;
     }
@@ -126,7 +129,7 @@ class Store {
 
   /// Fetches a specified number of oldest events from the store
   Future<List<Event>> fetch(int count) async {
-    final db = await _getDb();
+    final db = _db ?? await _getDb();
     if (db == null) {
       return [];
     }
@@ -145,11 +148,13 @@ class Store {
     return _db;
   }
 
+  /// Returns cached database instance or waits for initialization
+  /// After first call, _db is always non-null, so this becomes synchronous
   Future<Database?> _getDb() async {
     if (_db != null) {
       return _db;
     }
-    return await _init();
+    return await _dbFuture;
   }
 
   Future<Database?> _openDb() async {
