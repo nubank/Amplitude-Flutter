@@ -15,6 +15,14 @@ class MockClient implements Client {
     return Future.value(httpStatus);
   }
 
+  @override
+  void postAsync(List<Map<String, dynamic>> eventData) {
+    postCalls.add(eventData);
+  }
+
+  @override
+  void dispose() {}
+
   void reset() => postCalls.clear();
 
   int get postCallCount => postCalls.length;
