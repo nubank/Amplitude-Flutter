@@ -1,4 +1,14 @@
-class Config {
+/// {@template Config}
+/// Configuration class for the Amplitude SDK.
+/// {@endtemplate}
+final class Config {
+  /// {@macro Config}
+  /// Creates a new Config instance with the given parameters.
+  /// All parameters have default values.
+  /// [enableUuid] defaults to true.
+  /// Other parameters include session timeout, buffer size,
+  /// maximum stored events, flush period, opt-out status
+  /// and carrier info retrieval.
   Config({
     this.sessionTimeout = defaultSessionTimeout,
     this.bufferSize = defaultBufferSize,

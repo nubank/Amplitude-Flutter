@@ -1,5 +1,5 @@
-import 'package:amplitude_flutter/src/constants.dart';
-import 'package:amplitude_flutter/src/device_info.dart';
+import 'package:amplitude_flutter/src/device/device_info.dart';
+import 'package:amplitude_flutter/src/utils/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

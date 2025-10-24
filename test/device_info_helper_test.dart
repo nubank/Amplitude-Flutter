@@ -1,4 +1,4 @@
-import 'package:amplitude_flutter/src/device_info_helper.dart';
+import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 

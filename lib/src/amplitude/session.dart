@@ -1,6 +1,5 @@
+import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter/widgets.dart';
-
-import './time_utils.dart';
 
 class Session with WidgetsBindingObserver {
   factory Session(int timeout) {
@@ -26,12 +25,12 @@ class Session with WidgetsBindingObserver {
   int? lastActivity;
 
   void start() {
-    sessionStart = currentTime();
+    sessionStart = DateTime.now().toMs();
     lastActivity = sessionStart;
   }
 
   void refresh() {
-    final int now = currentTime();
+    final int now = DateTime.now().toMs();
     if (!withinSession(now)) {
       sessionStart = now;
     }
@@ -64,7 +63,7 @@ class Session with WidgetsBindingObserver {
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
         enterBackground();
-        lastActivity = currentTime();
+        lastActivity = DateTime.now().toMs();
         break;
       case AppLifecycleState.resumed:
         refresh();

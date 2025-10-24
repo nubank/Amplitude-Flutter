@@ -1,13 +1,10 @@
 import 'dart:developer' as developer;
 
+import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:uuid/uuid.dart';
-
-import 'constants.dart';
-import 'device_info_helper.dart';
-import 'metadata_store.dart';
 
 class DeviceInfo {
   DeviceInfo(this.getCarrierInfo);

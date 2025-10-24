@@ -1,4 +1,4 @@
-import 'package:amplitude_flutter/src/client.dart';
+import 'package:amplitude_flutter/amplitude_flutter.dart';
 
 class MockClient implements Client {
   MockClient({this.httpStatus = 200});

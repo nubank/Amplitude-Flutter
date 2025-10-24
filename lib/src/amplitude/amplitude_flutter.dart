@@ -1,13 +1,6 @@
 import 'dart:async';
 
-import 'config.dart';
-import 'device_info.dart';
-import 'event.dart';
-import 'event_buffer.dart';
-import 'identify.dart';
-import 'revenue.dart';
-import 'service_provider.dart';
-import 'session.dart';
+import 'package:amplitude_flutter/amplitude_flutter.dart';
 
 class AmplitudeFlutter {
   AmplitudeFlutter(String apiKey, [Config? config])
@@ -16,7 +9,6 @@ class AmplitudeFlutter {
           apiKey: apiKey,
           timeout: (config ?? Config()).sessionTimeout,
           getCarrierInfo: (config ?? Config()).getCarrierInfo,
-          enableUuid: (config ?? Config()).enableUuid,
         ) {
     _init();
   }
@@ -26,7 +18,6 @@ class AmplitudeFlutter {
   }
 
   bool? getCarrierInfo;
-  late final bool enableUuid;
   final Config config;
   final ServiceProvider provider;
   late final DeviceInfo deviceInfo;
@@ -57,25 +48,22 @@ class AmplitudeFlutter {
       return;
     }
 
-    final Event event = enableUuid
-        ? Event.uuid(name,
-            sessionId: session.getSessionId(), props: properties)
-        : Event.noUuid(name,
-            sessionId: session.getSessionId(), props: properties);
+    final Event event = Event(name, properties: properties);
 
     final Map<String, String> advertisingValues =
         _cachedAdvertisingInfo ?? deviceInfo.getAdvertisingInfo();
-    event.addProps(<String, dynamic>{'api_properties': advertisingValues});
+    event.labels
+        ?.addAll(<String, dynamic>{'api_properties': advertisingValues});
 
     final platformInfo =
         _cachedPlatformInfo ?? await deviceInfo.getPlatformInfo();
-    event.addProps(platformInfo);
+    event.labels?.addAll(platformInfo ?? <String, dynamic>{});
 
     if (userId != null) {
-      event.addProp('user_id', userId);
+      event.labels?.addAll({'user_id': userId});
     }
 
-    return buffer.add(event);
+    return buffer.add(event.toEntity());
   }
 
   /// Log many events
@@ -89,7 +77,6 @@ class AmplitudeFlutter {
         _cachedAdvertisingInfo ?? deviceInfo.getAdvertisingInfo();
     final platformInfo =
         _cachedPlatformInfo ?? await deviceInfo.getPlatformInfo();
-    final sessionId = session.getSessionId();
 
     // Optimized: Build common properties map once
     final commonProps = <String, dynamic>{
@@ -101,26 +88,15 @@ class AmplitudeFlutter {
     }
 
     // Optimized: Create events with properties in single pass
-    final eventsList = List<Event>.generate(
-      events.length,
-      (i) {
-        final eventData = events[i];
-        final event = enableUuid
-            ? Event.uuid(
-                eventData['name'],
-                sessionId: sessionId,
-                props: eventData['properties'],
-              )
-            : Event.noUuid(
-                eventData['name'],
-                sessionId: sessionId,
-                props: eventData['properties'],
-              );
-        event.addProps(commonProps);
-        return event;
-      },
-      growable: false,
-    );
+    final eventsList = events.map((eventData) {
+      return Event(
+        eventData['name'],
+        properties: <String, dynamic>{
+          ...?eventData['properties'],
+          ...commonProps,
+        },
+      ).toEntity();
+    }).toList(growable: false);
 
     return buffer.addAll(eventsList);
   }
@@ -169,7 +145,6 @@ class AmplitudeFlutter {
   }
 
   void _init() {
-    enableUuid = config.enableUuid;
     deviceInfo = provider.deviceInfo;
     session = provider.session;
     buffer = EventBuffer(provider, config);

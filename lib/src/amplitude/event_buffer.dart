@@ -1,25 +1,18 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter/foundation.dart';
 
-import 'client.dart';
-import 'config.dart';
-import 'event.dart';
-import 'service_provider.dart';
-import 'store.dart';
-import 'time_utils.dart';
-
 class EventBuffer {
-  EventBuffer(this.provider, this.config) {
-    client = provider.client;
-    store = provider.store;
-  }
+  EventBuffer(this.provider, this.config)
+      : store = provider.store,
+        client = provider.client;
 
   final Config config;
   final ServiceProvider provider;
   Client? client;
-  Store? store;
+  StorageDatasource<EventEntity>? store;
 
   Future<void>? _flushFuture;
   Timer? _flushTimer;
@@ -49,13 +42,11 @@ class EventBuffer {
   }
 
   /// Adds a raw event hash to the buffer
-  Future<void> add(Event event) async {
+  Future<void> add(EventEntity event) async {
     if (length >= config.maxStoredEvents) {
       debugPrint('Amplitude: Max stored events reached. Drop first event');
       await store!.drop(1);
     }
-
-    event.timestamp = currentTime();
     await store!.add(event);
 
     if (length == 1) {
@@ -68,7 +59,7 @@ class EventBuffer {
   }
 
   /// Adds many raw event hash to the buffer
-  Future<void> addAll(List<Event> eventsList) async {
+  Future<void> addAll(List<EventEntity> eventsList) async {
     if (eventsList.isEmpty) {
       return;
     }
@@ -80,11 +71,6 @@ class EventBuffer {
       debugPrint(
           'Amplitude: Max stored events reached. Drop first $dropCount events');
       await store!.drop(dropCount);
-    }
-
-    final timestamp = currentTime();
-    for (final event in eventsList) {
-      event.timestamp = timestamp;
     }
     await store!.addAll(eventsList);
 
@@ -132,7 +118,7 @@ class EventBuffer {
   }
 
   @visibleForTesting
-  Future<List<Event>> fetch(int count) async {
+  Future<List<EventEntity>> fetch(int count) async {
     assert(count >= 0);
 
     final endRange = min(count, store!.length);

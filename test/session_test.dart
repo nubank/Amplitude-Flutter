@@ -1,4 +1,4 @@
-import 'package:amplitude_flutter/src/session.dart';
+import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 

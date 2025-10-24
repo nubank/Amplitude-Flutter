@@ -1,5 +1,5 @@
+import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'constants.dart';
 
 class MetadataStore {
   factory MetadataStore() => _instance ??= MetadataStore._();

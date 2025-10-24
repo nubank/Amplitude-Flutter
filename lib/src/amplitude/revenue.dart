@@ -1,4 +1,4 @@
-class Revenue {
+final class Revenue {
   Revenue() {
     payload[quantity] = 1;
   }

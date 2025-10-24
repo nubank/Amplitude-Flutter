@@ -1,55 +1,52 @@
-import 'dart:convert';
-
-import 'package:path/path.dart' as path;
-import 'package:sqflite/sqflite.dart';
-
-import 'event.dart';
-
-const String eventsTable = 'events';
-const String colId = 'id';
-const String colEventType = 'event_type';
-const String colTimestamp = 'timestamp';
-const String colSessionId = 'session_id';
-const String colProps = 'props_json';
-const String defaultDbName = 'amp.db';
+part of '../storage_datasource.dart';
 
 /// {@template store}
 /// Persistent storage for events using SQLite
 /// {@endtemplate}
-class Store {
+final class SqliteStore extends StorageDatasource<Event> {
   /// {@macro store}
-  /// Singleton factory constructor for Store instances
+  /// Singleton factory constructor for SqliteStore instances
   /// Uses [dbFile] as the database file name
   /// If [enableUuid] is true, events will be stored with UUIDs
   /// Otherwise, events will be stored without UUIDs
   /// Multiple instances can be created with different [dbFile] names
-  factory Store({
-    String dbFile = defaultDbName,
+  factory SqliteStore({
+    String dbFile = _defaultDbName,
     bool enableUuid = true,
   }) =>
-      _instances.putIfAbsent(dbFile, () => Store._(dbFile, enableUuid));
+      _instances.putIfAbsent(dbFile, () => SqliteStore._(dbFile, enableUuid));
 
-  Store._(this.dbFile, this.enableUuid) {
+  SqliteStore._(this.dbFile, this.enableUuid) {
     _dbFuture = _init();
   }
 
   bool enableUuid;
-  static final Map<String, Store> _instances = {};
+  static final Map<String, SqliteStore> _instances = {};
   Database? _db;
   final String dbFile;
+  @override
   int length = 0;
+
+  static const _eventsTable = 'events';
+  static const _colId = 'id';
+  static const _colEventType = 'event_type';
+  static const _colTimestamp = 'timestamp';
+  static const _colSessionId = 'session_id';
+  static const _colProps = 'props_json';
+  static const _defaultDbName = 'amp.db';
 
   /// Cached Future for database initialization to avoid multiple awaits
   late final Future<Database?> _dbFuture;
 
   /// Adds a raw event hash to the store
+  @override
   Future<int> add(Event event) async {
     final db = _db ?? await _getDb();
     if (db == null) {
       return 0;
     }
     try {
-      final result = await db.insert(eventsTable, _serialize(event));
+      final result = await db.insert(_eventsTable, _serialize(event));
       length++;
       return result;
     } catch (ex) {
@@ -58,7 +55,8 @@ class Store {
   }
 
   /// Adds multiple events to the store
-  Future<List<Object?>> addAll(List<Event> events) async {
+  @override
+  Future<List<Event?>> addAll(List<Event> events) async {
     final db = _db ?? await _getDb();
     if (db == null) {
       return [];
@@ -66,23 +64,25 @@ class Store {
     try {
       final batch = db.batch();
       for (final event in events) {
-        batch.insert(eventsTable, _serialize(event));
+        batch.insert(_eventsTable, _serialize(event));
         length++;
       }
-      return await batch.commit(noResult: true);
+      await batch.commit(noResult: true);
+      return events;
     } catch (ex) {
       return [];
     }
   }
 
   /// Empties the store
+  @override
   Future<void> empty() async {
     final db = _db ?? await _getDb();
     if (db == null) {
       return;
     }
     try {
-      await db.rawDelete('DELETE FROM $eventsTable; VACUUM;');
+      await db.rawDelete('DELETE FROM $_eventsTable; VACUUM;');
       length = 0;
     } catch (ex) {
       return;
@@ -90,12 +90,14 @@ class Store {
   }
 
   /// Counts the number of events in the store
+  @override
   Future<int?> count() async {
     final db = _db ?? await _getDb();
     return _count(db);
   }
 
   /// Drops a specified number of events from the store
+  @override
   Future<void> drop(int count) async {
     final db = _db ?? await _getDb();
     if (db == null) {
@@ -103,7 +105,7 @@ class Store {
     }
     try {
       final resultCount = await db.rawDelete(
-          'DELETE FROM $eventsTable WHERE ROWID IN (SELECT ROWID FROM $eventsTable LIMIT ?)',
+          'DELETE FROM $_eventsTable WHERE ROWID IN (SELECT ROWID FROM $_eventsTable LIMIT ?)',
           [count]);
       length -= resultCount;
     } catch (ex) {
@@ -112,6 +114,7 @@ class Store {
   }
 
   /// Deletes events with specified IDs from the store
+  @override
   Future<void> delete(List<int?> eventIds) async {
     final db = _db ?? await _getDb();
     if (db == null) {
@@ -120,7 +123,7 @@ class Store {
     try {
       final placeholders = List.filled(eventIds.length, '?').join(',');
       final count = await db.rawDelete(
-          'DELETE FROM $eventsTable WHERE id IN ($placeholders)', eventIds);
+          'DELETE FROM $_eventsTable WHERE id IN ($placeholders)', eventIds);
       length -= count;
     } catch (ex) {
       return;
@@ -128,13 +131,15 @@ class Store {
   }
 
   /// Fetches a specified number of oldest events from the store
+  @override
   Future<List<Event>> fetch(int count) async {
     final db = _db ?? await _getDb();
     if (db == null) {
       return [];
     }
     try {
-      final records = await db.query(eventsTable, limit: count, orderBy: colId);
+      final records =
+          await db.query(_eventsTable, limit: count, orderBy: _colId);
       return records.map((m) => _deserialize(m)).toList();
     } catch (ex) {
       return [];
@@ -164,12 +169,12 @@ class Store {
 
       final createDb = (Database db, int version) async {
         await db.execute('''
-          create table $eventsTable (
-            $colId integer primary key autoincrement,
-            $colEventType text not null,
-            $colSessionId text,
-            $colTimestamp integer,
-            $colProps text
+          create table $_eventsTable (
+            $_colId integer primary key autoincrement,
+            $_colEventType text not null,
+            $_colSessionId text,
+            $_colTimestamp integer,
+            $_colProps text
           )
         ''');
       };
@@ -185,7 +190,7 @@ class Store {
     }
     try {
       final List<Map<String, dynamic>> rows =
-          await db.rawQuery('SELECT COUNT(*) as count FROM $eventsTable');
+          await db.rawQuery('SELECT COUNT(*) as count FROM $_eventsTable');
       return rows.single['count'];
     } catch (e) {
       return 0;
@@ -193,21 +198,10 @@ class Store {
   }
 
   Map<String, dynamic> _serialize(Event e) => {
-        colEventType: e.name,
-        colSessionId: e.sessionId,
-        colTimestamp: e.timestamp,
-        colProps: json.encode(e.props),
+        _colEventType: e.name,
+        _colProps: json.encode(e.props),
       };
 
-  Event _deserialize(Map<String, dynamic> map) => enableUuid
-      ? Event.uuid(map[colEventType],
-          sessionId: map[colSessionId],
-          timestamp: map[colTimestamp],
-          id: map[colId],
-          props: json.decode(map[colProps]))
-      : Event.noUuid(map[colEventType],
-          sessionId: map[colSessionId],
-          timestamp: map[colTimestamp],
-          id: map[colId],
-          props: json.decode(map[colProps]));
+  Event _deserialize(Map<String, dynamic> map) =>
+      Event(map[_colEventType], properties: json.decode(map[_colProps]));
 }
