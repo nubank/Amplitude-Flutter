@@ -1,9 +1,16 @@
 part of 'analytics_model.dart';
 
+/// {@template Event}
+/// Class representing an analytics event.
+/// {@endtemplate}
 class Event extends AnalyticsModel {
+  /// {@macro Event}
+  /// [name] is the name of the event.
+  /// [properties] are the optional properties associated with the event.
   const Event(this.name, {Map<String, dynamic>? properties})
       : _properties = properties;
 
+  /// Creates an Event from a JSON map.
   factory Event.fromJson(Map<String, dynamic> json) => Event(
         json['name'] as String,
         properties: json['properties'] as Map<String, dynamic>?,
@@ -40,7 +47,11 @@ class Event extends AnalyticsModel {
   List<Object?> get props => [name, _properties];
 }
 
+/// {@template EventExtension}
+/// Extension methods for Event.
+/// {@endtemplate}
 extension EventExtension on Event {
+  /// Converts the Event to an EventEntity.
   EventEntity toEntity() {
     return EventEntity.fromEvent(this);
   }

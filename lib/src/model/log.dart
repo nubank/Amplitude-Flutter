@@ -1,13 +1,21 @@
 part of 'analytics_model.dart';
 
+/// {@template Log}
+/// Class representing a log entry.
+/// {@endtemplate}
 class Log extends AnalyticsModel {
+  /// {@macro Log}
+  /// [message] is the log message.
+  /// [data] are the optional data associated with the log.
   const Log(this.message, {Map<String, dynamic>? data}) : _data = data;
 
+  /// Creates a Log from a JSON map.
   factory Log.fromJson(Map<String, dynamic> json) => Log(
         json['message'] as String,
         data: json['data'] as Map<String, dynamic>?,
       );
 
+  /// The log message.
   final String message;
 
   final Map<String, dynamic>? _data;

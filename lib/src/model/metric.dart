@@ -1,11 +1,23 @@
 part of 'analytics_model.dart';
 
+/// {@template MetricType}
+/// Enum representing different types of metrics.
+/// {@endtemplate}
 enum MetricType {
+  /// Counter metric type.
   counter,
+
+  /// Gauge metric type.
   gauge,
+
+  /// Histogram metric type.
   histogram,
+
+  /// Summary metric type.
   summary;
 
+  /// Creates a MetricType from a string.
+  /// Returns null if the string does not match any MetricType.
   static MetricType? fromString(String value) => switch (value) {
         'counter' => counter,
         'gauge' => gauge,
@@ -17,11 +29,19 @@ enum MetricType {
   String toJson() => name;
 }
 
+/// {@template Metric}
+/// Class representing a metric for analytics.
+/// {@endtemplate}
 class Metric extends AnalyticsModel {
+  /// {@macro Metric}
+  /// [name] is the name of the metric.
+  /// [type] is the type of the metric.
+  /// [labels] are the optional labels associated with the metric.
   const Metric(this.name,
       {this.type = MetricType.counter, Map<String, String>? labels})
       : _labels = labels;
 
+  /// Creates a Metric from a JSON map.
   factory Metric.fromJson(Map<String, dynamic> json) => Metric(
         json['name'] as String,
         type:
@@ -30,21 +50,26 @@ class Metric extends AnalyticsModel {
             (json['labels'] as Map<String, dynamic>?)?.cast<String, String>(),
       );
 
+  /// Creates a counter Metric.
   const Metric.counter(String name, {Map<String, String>? labels})
       : this(name, type: MetricType.counter, labels: labels);
 
+  /// Creates a gauge Metric.
   const Metric.gauge(String name, {Map<String, String>? labels})
       : this(name, type: MetricType.gauge, labels: labels);
 
+  /// Creates a histogram Metric.
   const Metric.histogram(String name, {Map<String, String>? labels})
       : this(name, type: MetricType.histogram, labels: labels);
 
+  /// Creates a summary Metric.
   const Metric.summary(String name, {Map<String, String>? labels})
       : this(name, type: MetricType.summary, labels: labels);
 
   @override
   final String name;
 
+  /// The type of the metric.
   final MetricType type;
 
   final Map<String, String>? _labels;

@@ -4,18 +4,34 @@ import 'dart:math';
 import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter/foundation.dart';
 
+/// {@template event_buffer}
+/// Buffer for storing and flushing events to Amplitude servers.
+/// {@endtemplate}
 class EventBuffer {
+  /// {@macro event_buffer}
+  /// Buffer for storing and flushing events to Amplitude servers.
+  /// [provider] is the ServiceProvider instance.
+  /// [config] is the configuration for the Amplitude SDK.
   EventBuffer(this.provider, this.config)
       : store = provider.store,
         client = provider.client;
 
+  /// Configuration for the Amplitude SDK.
   final Config config;
+
+  /// Service provider for accessing client and storage.
   final ServiceProvider provider;
+
+  /// HTTP client for sending events.
   Client? client;
+
+  /// Local storage datasource for persisting events.
   StorageDatasource<EventEntity>? store;
 
   Future<void>? _flushFuture;
   Timer? _flushTimer;
+
+  /// Number of events to flush in the next operation
   int? numEvents;
 
   /// Returns number of events in buffer
@@ -26,14 +42,12 @@ class EventBuffer {
     if (_flushTimer != null) {
       return;
     }
-
     _flushTimer = Timer.periodic(
       Duration(seconds: config.flushPeriod),
       (Timer timer) {
         if (length > 0) {
           flush();
         } else {
-          /// Stop timer when buffer is empty to save battery
           timer.cancel();
           _flushTimer = null;
         }
@@ -48,11 +62,9 @@ class EventBuffer {
       await store!.drop(1);
     }
     await store!.add(event);
-
     if (length == 1) {
       _scheduleFlushTimer();
     }
-
     if (length >= config.bufferSize) {
       await flush();
     }
@@ -63,9 +75,7 @@ class EventBuffer {
     if (eventsList.isEmpty) {
       return;
     }
-
     final previousLength = length;
-
     if (length + eventsList.length >= config.maxStoredEvents) {
       final dropCount = length + eventsList.length - config.maxStoredEvents;
       debugPrint(
@@ -73,8 +83,6 @@ class EventBuffer {
       await store!.drop(dropCount);
     }
     await store!.addAll(eventsList);
-
-    /// Start timer when first events are added
     if (previousLength == 0 && length > 0) {
       _scheduleFlushTimer();
     }
@@ -88,7 +96,6 @@ class EventBuffer {
     if (length < 1) {
       return;
     }
-
     _flushFuture = _performFlush();
     try {
       await _flushFuture;
@@ -103,7 +110,6 @@ class EventBuffer {
     final List<Map<String, dynamic>> payload =
         events.map((e) => e.toPayload()).toList();
     final eventIds = events.map((e) => e.id).toList();
-
     final status = await client!.post(payload);
     switch (status) {
       case 200:
@@ -120,13 +126,11 @@ class EventBuffer {
   @visibleForTesting
   Future<List<EventEntity>> fetch(int count) async {
     assert(count >= 0);
-
     final endRange = min(count, store!.length);
     return await store!.fetch(endRange);
   }
 
   Future<void> _handlePayloadTooLarge(List<int?> eventIds) async {
-    // drop a single event that is too large
     if (eventIds.length == 1) {
       await _deleteEvents(eventIds);
     } else {
@@ -139,6 +143,7 @@ class EventBuffer {
     numEvents = null;
   }
 
+  /// Disposes the buffer and cancels any active timers
   void dispose() {
     _flushTimer?.cancel();
     _flushTimer = null;

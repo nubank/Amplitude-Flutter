@@ -6,19 +6,31 @@ import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:uuid/uuid.dart';
 
+/// {@template device_info}
+/// Class for retrieving device information such as OS version, model, and
+/// advertising identifiers.
+/// {@endtemplate}
 class DeviceInfo {
+  /// {@macro device_info}
+  /// Creates a new DeviceInfo instance.
+  /// [getCarrierInfo] indicates whether to fetch carrier information.
   DeviceInfo(this.getCarrierInfo);
+
+  /// Indicates whether to fetch carrier information.
   bool getCarrierInfo;
+
+  /// DeviceInfoPlugin instance for accessing device information.
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+
   Map<String, String?>? _deviceData = <String, String>{};
   final Map<String, String> _advData = <String, String>{};
   bool _isInitialized = false;
 
+  /// Returns platform information such as OS name, version, device model, etc.
   Future<Map<String, String?>?> getPlatformInfo() async {
     if (_isInitialized && _deviceData!.isNotEmpty) {
       return _deviceData;
     }
-
     Map<String, String?> deviceData = {};
     try {
       if (defaultTargetPlatform == TargetPlatform.android) {

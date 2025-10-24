@@ -13,6 +13,7 @@ final class ObjectStore extends StorageDatasource<EventEntity> {
   }) =>
       _instances.putIfAbsent(storeName, () => ObjectStore._(storeName));
 
+  /// Private constructor for ObjectStore
   ObjectStore._(this.storeName) {
     _storeFuture = _init();
   }

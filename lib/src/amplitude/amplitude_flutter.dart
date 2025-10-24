@@ -2,7 +2,14 @@ import 'dart:async';
 
 import 'package:amplitude_flutter/amplitude_flutter.dart';
 
+/// {@template amplitude_flutter}
+/// Main Amplitude Flutter class for logging events and managing user sessions.
+/// {@endtemplate}
 class AmplitudeFlutter {
+  /// {@macro amplitude_flutter}
+  ///
+  /// [apiKey] is the Amplitude API key for your project.
+  /// [config] is an optional configuration object.
   AmplitudeFlutter(String apiKey, [Config? config])
       : config = config ?? Config(),
         provider = ServiceProvider(
@@ -71,14 +78,10 @@ class AmplitudeFlutter {
     if (config.optOut) {
       return;
     }
-
-    // Optimized: Pre-fetch common properties once
     final Map<String, String> advertisingValues =
         _cachedAdvertisingInfo ?? deviceInfo.getAdvertisingInfo();
     final platformInfo =
         _cachedPlatformInfo ?? await deviceInfo.getPlatformInfo();
-
-    // Optimized: Build common properties map once
     final commonProps = <String, dynamic>{
       'api_properties': advertisingValues,
       ...?platformInfo,
@@ -86,8 +89,6 @@ class AmplitudeFlutter {
     if (userId != null) {
       commonProps['user_id'] = userId;
     }
-
-    // Optimized: Create events with properties in single pass
     final eventsList = events.map((eventData) {
       return Event(
         eventData['name'],

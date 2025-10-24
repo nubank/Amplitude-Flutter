@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 
+/// {@template identify}
+/// Class for building user property operations for Amplitude Identify API.
+/// {@endtemplate}
 class Identify {
   final Map<String, dynamic> payload = {};
 

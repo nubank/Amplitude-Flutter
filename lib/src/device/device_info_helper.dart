@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 const MethodChannel _channel = MethodChannel('amplitude_flutter');
 
+/// Returns the carrier name of the device.
 Future<String?> get getDeviceCarrierName async {
   try {
     final String? carrierName = await _channel.invokeMethod('carrierName');

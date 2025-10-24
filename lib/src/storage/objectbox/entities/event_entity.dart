@@ -3,7 +3,20 @@ import 'dart:convert';
 import 'package:amplitude_flutter/amplitude_flutter.dart';
 
 @Entity()
+
+/// {@template EventEntity}
+/// EventEntity is a class that represents an event stored in the local
+/// database using ObjectBox. It includes fields for the event's ID, name,
+/// properties (as a JSON string), creation timestamp, and session ID.
+/// It also provides methods to convert between EventEntity and Event objects.
+/// {@endtemplate}
 final class EventEntity {
+  /// {@macro EventEntity}
+  /// [id] is the unique identifier for the event.
+  /// [name] is the name of the event.
+  /// [propertiesJson] is the JSON string representation of the event's properties.
+  /// [createdAt] is the timestamp when the event was created.
+  /// [sessionId] is the session identifier associated with the event.
   EventEntity({
     this.id = 0,
     required this.name,
@@ -13,6 +26,7 @@ final class EventEntity {
   })  : createdAt = createdAt ?? DateTime.now(),
         sessionId = sessionId ?? DateTime.now();
 
+  /// Creates an EventEntity from an Event.
   factory EventEntity.fromEvent(Event event) {
     return EventEntity(
       name: event.name,
@@ -32,6 +46,7 @@ final class EventEntity {
   @Property(type: PropertyType.date)
   DateTime sessionId;
 
+  /// Converts the EventEntity back to an Event.
   Event toEvent() {
     return Event(
       name ?? '',
@@ -59,7 +74,11 @@ final class EventEntity {
   }
 }
 
+/// {@template EventEntityExtensions}
+/// Extension methods for EventEntity.
+/// {@endtemplate}
 extension EventEntityExtensions on EventEntity {
+  /// Converts the EventEntity to a payload map.
   Map<String, dynamic> toPayload() {
     return {
       'event_id': id,
@@ -69,6 +88,7 @@ extension EventEntityExtensions on EventEntity {
     }..addAll(properties ?? {});
   }
 
+  /// Converts the EventEntity to an Event with metadata.
   Event toEventWithMetadata() {
     final event = toEvent();
     return Event(

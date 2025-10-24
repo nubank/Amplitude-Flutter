@@ -1,15 +1,14 @@
 import 'package:amplitude_flutter/amplitude_flutter.dart';
 import 'package:flutter/widgets.dart';
 
+/// {@template session}
+/// Class for managing user sessions.
+/// {@endtemplate}
 class Session with WidgetsBindingObserver {
-  factory Session(int timeout) {
-    if (_instance != null) {
-      return _instance!;
-    }
-    _instance = Session._internal(timeout);
-    return _instance!;
-  }
+  /// Creates a new Session instance with the given timeout.
+  factory Session(int timeout) => _instance ??= Session._internal(timeout);
 
+  /// Private constructor for singleton pattern
   Session._internal(this.timeout) {
     final widgetsBinding = WidgetsBinding.instance;
     widgetsBinding.addObserver(this);
@@ -24,11 +23,14 @@ class Session with WidgetsBindingObserver {
   int? sessionStart;
   int? lastActivity;
 
+  /// Starts a new session by setting the sessionStart and lastActivity
+  /// to the current timestamp.
   void start() {
     sessionStart = DateTime.now().toMs();
     lastActivity = sessionStart;
   }
 
+  /// Refreshes the session by updating the lastActivity timestamp.
   void refresh() {
     final int now = DateTime.now().toMs();
     if (!withinSession(now)) {
@@ -37,6 +39,7 @@ class Session with WidgetsBindingObserver {
     lastActivity = now;
   }
 
+  /// Checks if the given timestamp is within the current session.
   bool withinSession(int timestamp) {
     if (sessionStart == null) {
       return false;
@@ -44,14 +47,17 @@ class Session with WidgetsBindingObserver {
     return timestamp - sessionStart! < timeout;
   }
 
+  /// Handles app lifecycle changes to manage session state.
   void enterBackground() {
     // Track when app goes to background
   }
 
+  /// Handles when the app returns from background.
   void exitBackground() {
     // Track when app returns from background
   }
 
+  /// Retrieves the current session ID as a string.
   String getSessionId() {
     return sessionStart.toString();
   }
