@@ -24,6 +24,8 @@ class Event extends AnalyticsModel {
   @override
   Map<String, dynamic>? get labels => _properties;
 
+  Map<String, dynamic>? get properties => _properties;
+
   @override
   Map<String, dynamic> toMap() => {
         '_type': 'event',

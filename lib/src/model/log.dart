@@ -26,6 +26,8 @@ class Log extends AnalyticsModel {
   @override
   Map<String, dynamic>? get labels => _data;
 
+  Map<String, dynamic>? get data => _data;
+
   @override
   Map<String, dynamic> toMap() => {
         '_type': 'log',

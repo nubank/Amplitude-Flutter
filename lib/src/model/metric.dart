@@ -77,6 +77,8 @@ class Metric extends AnalyticsModel {
   @override
   Map<String, dynamic>? get labels => _labels;
 
+  Map<String, String>? get properties => _labels;
+
   @override
   Map<String, dynamic> toMap() => {
         '_type': 'metric',
