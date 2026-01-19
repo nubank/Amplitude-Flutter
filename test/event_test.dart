@@ -8,124 +8,33 @@ void main() {
     late Event subject;
 
     setUp(() {
-      subject = Event.uuid('Event Unit Test');
+      subject = Event.create('Event Unit Test');
     });
 
-    group('enableUuid logic', () {
-      group('Event.uuid factory', () {
-        test('generates a UUID', () {
-          final event = Event.uuid('test');
-          expect(event.uuid, isNotNull);
-        });
-
-        test('generates a valid v4 UUID format', () {
-          final event = Event.uuid('test');
-          final uuidRegex = RegExp(
-              r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
-              caseSensitive: false);
-          expect(event.uuid, matches(uuidRegex));
-        });
-
-        test('generates unique UUIDs for different events', () {
-          final event1 = Event.uuid('test1');
-          final event2 = Event.uuid('test2');
-          expect(event1.uuid, isNotNull);
-          expect(event2.uuid, isNotNull);
-          expect(event1.uuid, isNot(equals(event2.uuid)));
-        });
-
-        test('includes UUID in toPayload output', () {
-          final event = Event.uuid('test');
-          final payload = event.toPayload();
-          expect(payload['uuid'], isNotNull);
-          expect(payload['uuid'], equals(event.uuid));
-        });
-
-        test('preserves all other properties while adding UUID', () {
-          final event = Event.uuid('test',
-              sessionId: 'session123',
-              timestamp: 1234567890,
-              id: 42,
-              props: {'custom': 'value'});
-
-          expect(event.name, equals('test'));
-          expect(event.sessionId, equals('session123'));
-          expect(event.timestamp, equals(1234567890));
-          expect(event.id, equals(42));
-          expect(event.props['custom'], equals('value'));
-          expect(event.uuid, isNotNull);
-        });
+    group('Event.create factory', () {
+      test('creates event with basic properties', () {
+        final event = Event.create('test');
+        expect(event.name, equals('test'));
       });
 
-      group('Event.noUuid factory', () {
-        test('does not generate a UUID', () {
-          final event = Event.noUuid('test');
-          expect(event.uuid, isNull);
-        });
+      test('creates event with all properties', () {
+        final event = Event.create('test',
+            sessionId: 'session123',
+            timestamp: 1234567890,
+            id: 42,
+            props: {'custom': 'value'});
 
-        test('includes null UUID in toPayload output', () {
-          final event = Event.noUuid('test');
-          final payload = event.toPayload();
-          expect(payload.containsKey('uuid'), isTrue);
-          expect(payload['uuid'], isNull);
-        });
-
-        test('preserves all other properties without UUID', () {
-          final event = Event.noUuid('test',
-              sessionId: 'session123',
-              timestamp: 1234567890,
-              id: 42,
-              props: {'custom': 'value'});
-
-          expect(event.name, equals('test'));
-          expect(event.sessionId, equals('session123'));
-          expect(event.timestamp, equals(1234567890));
-          expect(event.id, equals(42));
-          expect(event.props['custom'], equals('value'));
-          expect(event.uuid, isNull);
-        });
+        expect(event.name, equals('test'));
+        expect(event.sessionId, equals('session123'));
+        expect(event.timestamp, equals(1234567890));
+        expect(event.id, equals(42));
+        expect(event.props['custom'], equals('value'));
       });
 
-      group('UUID persistence', () {
-        test('UUID remains constant after creation', () {
-          final event = Event.uuid('test');
-          final originalUuid = event.uuid;
-
-          // Perform various operations
-          event.addProp('newProp', 'newValue');
-          event.addProps({'anotherProp': 'anotherValue'});
-          final payload1 = event.toPayload();
-          final payload2 = event.toPayload();
-
-          expect(event.uuid, equals(originalUuid));
-          expect(payload1['uuid'], equals(originalUuid));
-          expect(payload2['uuid'], equals(originalUuid));
-        });
-
-        test('UUID can be manually set to null', () {
-          final event = Event.uuid('test');
-          expect(event.uuid, isNotNull);
-
-          event.uuid = null;
-          expect(event.uuid, isNull);
-
-          final payload = event.toPayload();
-          expect(payload['uuid'], isNull);
-        });
-
-        test('UUID can be manually overridden', () {
-          final event = Event.uuid('test');
-          final originalUuid = event.uuid;
-
-          const customUuid = 'custom-uuid-value';
-          event.uuid = customUuid;
-
-          expect(event.uuid, equals(customUuid));
-          expect(event.uuid, isNot(equals(originalUuid)));
-
-          final payload = event.toPayload();
-          expect(payload['uuid'], equals(customUuid));
-        });
+      test('does not include UUID in toPayload output', () {
+        final event = Event.create('test');
+        final payload = event.toPayload();
+        expect(payload.containsKey('uuid'), isFalse);
       });
     });
 
@@ -133,7 +42,7 @@ void main() {
       test('adds the passed props if any', () {
         expect(subject.props, isEmpty);
 
-        subject = Event.uuid('some props',
+        subject = Event.create('some props',
             props: <String, dynamic>{'cohort': 'test a'});
 
         expect(subject.props, containsPair('cohort', 'test a'));
@@ -193,7 +102,7 @@ void main() {
 
     group('.toPayload', () {
       test('properly formats an API payload', () {
-        subject = Event.uuid('click',
+        subject = Event.create('click',
             sessionId: '123',
             id: 99,
             props: <String, dynamic>{
@@ -209,10 +118,28 @@ void main() {
               'session_id': '123',
               'timestamp': 12345,
               'user_properties': {'cohort': 'test a'},
-              'uuid': isNotNull,
               'library': isNotNull
             }));
       });
+
+      test('includes all required fields in payload', () {
+        final event = Event.create('test_event',
+            sessionId: 'session123',
+            timestamp: 1234567890,
+            id: 42);
+
+        final payload = event.toPayload();
+
+        expect(payload['event_id'], equals(42));
+        expect(payload['event_type'], equals('test_event'));
+        expect(payload['session_id'], equals('session123'));
+        expect(payload['timestamp'], equals(1234567890));
+        expect(payload.containsKey('uuid'), isFalse);
+        expect(payload['library'], isNotNull);
+        expect(payload['library']['name'], isNotNull);
+        expect(payload['library']['version'], isNotNull);
+      });
     });
+
   });
 }

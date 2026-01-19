@@ -5,8 +5,6 @@ class MockStore implements Store {
   @override
   late int length = 0;
   int curId = 10000;
-  @override
-  bool enableUuid = true;
 
   final List<Event> db = <Event>[];
 
