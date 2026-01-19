@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 import 'constants.dart';
 
 class Event {
@@ -13,25 +11,8 @@ class Event {
     addProps(props);
   }
 
-  /// Factory method that creates an Event with a default UUID
-  factory Event.uuid(
-    String name, {
-    String? sessionId,
-    int? timestamp,
-    int? id,
-    Map<String, dynamic>? props,
-  }) {
-    return Event._(
-      name,
-      sessionId: sessionId,
-      timestamp: timestamp,
-      id: id,
-      props: props,
-    )..uuid = const Uuid().v4();
-  }
-
   /// Factory method that creates an Event without a UUID
-  factory Event.noUuid(
+  factory Event.create(
     String name, {
     String? sessionId,
     int? timestamp,

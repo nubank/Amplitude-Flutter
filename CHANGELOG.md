@@ -1,3 +1,7 @@
+## 1.4.6
+* Accept preset timestamp
+* Remove UUID
+
 ## 1.4.5
 * Fix mandatory property ServiceProvider
 

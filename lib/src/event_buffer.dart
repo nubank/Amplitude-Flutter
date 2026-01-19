@@ -40,7 +40,7 @@ class EventBuffer {
       await store!.drop(1);
     }
 
-    event.timestamp = TimeUtils().currentTime();
+    event.timestamp = event.props['timestamp'] ?? TimeUtils().currentTime();
     await store!.add(event);
 
     if (length >= config.bufferSize) {
@@ -61,7 +61,7 @@ class EventBuffer {
     }
 
     final events = eventsList.map((e) {
-      e.timestamp = TimeUtils().currentTime();
+      e.timestamp = e.props['timestamp'] ?? TimeUtils().currentTime();
       return e;
     }).toList();
     return store!.addAll(events);
