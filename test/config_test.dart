@@ -2,16 +2,10 @@ import 'package:amplitude_flutter/src/config.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('Config enableUuid', () {
+  group('Config', () {
     group('default configuration', () {
-      test('enableUuid defaults to true', () {
+      test('uses default values when no parameters provided', () {
         final config = Config();
-        expect(config.enableUuid, isTrue);
-      });
-
-      test('all other defaults are preserved when enableUuid is default', () {
-        final config = Config();
-        expect(config.enableUuid, isTrue);
         expect(config.sessionTimeout, equals(Config.defaultSessionTimeout));
         expect(config.bufferSize, equals(Config.defaultBufferSize));
         expect(config.maxStoredEvents, equals(Config.defaultMaxStoredEvents));
@@ -22,55 +16,7 @@ void main() {
     });
 
     group('explicit configuration', () {
-      test('enableUuid can be set to true explicitly', () {
-        final config = Config(enableUuid: true);
-        expect(config.enableUuid, isTrue);
-      });
-
-      test('enableUuid can be set to false', () {
-        final config = Config(enableUuid: false);
-        expect(config.enableUuid, isFalse);
-      });
-
-      test('enableUuid configuration does not affect other settings', () {
-        final configTrue = Config(
-          enableUuid: true,
-          sessionTimeout: 60000,
-          bufferSize: 20,
-          optOut: true,
-        );
-
-        final configFalse = Config(
-          enableUuid: false,
-          sessionTimeout: 60000,
-          bufferSize: 20,
-          optOut: true,
-        );
-
-        expect(configTrue.enableUuid, isTrue);
-        expect(configTrue.sessionTimeout, equals(60000));
-        expect(configTrue.bufferSize, equals(20));
-        expect(configTrue.optOut, isTrue);
-
-        expect(configFalse.enableUuid, isFalse);
-        expect(configFalse.sessionTimeout, equals(60000));
-        expect(configFalse.bufferSize, equals(20));
-        expect(configFalse.optOut, isTrue);
-      });
-    });
-
-    group('config immutability', () {
-      test('enableUuid is final and cannot be changed after creation', () {
-        final config = Config(enableUuid: true);
-        expect(config.enableUuid, isTrue);
-
-        // This should not compile if enableUuid is properly final
-        // config.enableUuid = false; // Would cause compilation error
-      });
-    });
-
-    group('configuration combinations', () {
-      test('enableUuid works with all other configuration options', () {
+      test('accepts custom values for all parameters', () {
         final config = Config(
           sessionTimeout: 120000,
           bufferSize: 50,
@@ -78,7 +24,6 @@ void main() {
           flushPeriod: 60,
           optOut: true,
           getCarrierInfo: true,
-          enableUuid: false,
         );
 
         expect(config.sessionTimeout, equals(120000));
@@ -87,7 +32,21 @@ void main() {
         expect(config.flushPeriod, equals(60));
         expect(config.optOut, isTrue);
         expect(config.getCarrierInfo, isTrue);
-        expect(config.enableUuid, isFalse);
+      });
+
+      test('allows partial configuration with defaults for others', () {
+        final config = Config(
+          sessionTimeout: 60000,
+          optOut: true,
+        );
+
+        expect(config.sessionTimeout, equals(60000));
+        expect(config.optOut, isTrue);
+        // Others should use defaults
+        expect(config.bufferSize, equals(Config.defaultBufferSize));
+        expect(config.maxStoredEvents, equals(Config.defaultMaxStoredEvents));
+        expect(config.flushPeriod, equals(Config.defaultFlushPeriod));
+        expect(config.getCarrierInfo, isFalse);
       });
     });
 

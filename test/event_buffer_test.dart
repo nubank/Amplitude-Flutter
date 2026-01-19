@@ -31,10 +31,10 @@ void main() {
       test('returns the length of events in the store', () async {
         expect(subject.length, equals(0));
 
-        await subject.add(Event.uuid('event 1'));
+        await subject.add(Event.create('event 1'));
         expect(subject.length, equals(1));
 
-        await subject.add(Event.uuid('event 2'));
+        await subject.add(Event.create('event 2'));
         expect(subject.length, equals(2));
       });
     });
@@ -42,7 +42,7 @@ void main() {
     group('.add', () {
       test('adds an event to the store, and adds a timestamp property',
           () async {
-        await subject.add(Event.uuid('event 1'));
+        await subject.add(Event.create('event 1'));
         expect(subject.length, equals(1));
 
         final List<Event> events = await subject.fetch(1);
@@ -54,11 +54,11 @@ void main() {
       test('flushes the buffer when the buffer size is reached', () async {
         subject = EventBuffer(provider, Config(bufferSize: 2));
 
-        await subject.add(Event.uuid('flush test'));
+        await subject.add(Event.create('flush test'));
         expect(client.postCallCount, equals(0));
 
         expect(subject.length, equals(1));
-        await subject.add(Event.uuid('event 2'));
+        await subject.add(Event.create('event 2'));
         expect(client.postCallCount, equals(1));
         expect(subject.length, equals(0));
 
@@ -77,11 +77,11 @@ void main() {
         subject =
             EventBuffer(provider, Config(bufferSize: 1, maxStoredEvents: 2));
 
-        await subject.add(Event.uuid('test 1'));
-        await subject.add(Event.uuid('test 2'));
+        await subject.add(Event.create('test 1'));
+        await subject.add(Event.create('test 2'));
         expect(subject.length, equals(2));
 
-        await subject.add(Event.uuid('test 3'));
+        await subject.add(Event.create('test 3'));
         expect(subject.length, equals(2));
       });
     });
@@ -90,9 +90,9 @@ void main() {
       test('adds many events to the store, and adds a timestamp property',
           () async {
         await subject.addAll([
-          Event.uuid('event 1'),
-          Event.uuid('event 2'),
-          Event.uuid('event 3'),
+          Event.create('event 1'),
+          Event.create('event 2'),
+          Event.create('event 3'),
         ]);
         expect(subject.length, equals(3));
 
@@ -114,20 +114,20 @@ void main() {
             ));
 
         await subject.addAll([
-          Event.uuid('test 1'),
-          Event.uuid('test 2'),
+          Event.create('test 1'),
+          Event.create('test 2'),
         ]);
         expect(subject.length, equals(2));
 
         await subject.addAll([
-          Event.uuid('test 3'),
-          Event.uuid('test 4'),
+          Event.create('test 3'),
+          Event.create('test 4'),
         ]);
         expect(subject.length, equals(3));
 
         await subject.addAll([
-          Event.uuid('test 5'),
-          Event.uuid('test 6'),
+          Event.create('test 5'),
+          Event.create('test 6'),
         ]);
         expect(subject.length, equals(3));
       });
@@ -138,9 +138,9 @@ void main() {
           () async {
         expect(subject.length, equals(0));
 
-        await subject.add(Event.uuid('event 1'));
-        await subject.add(Event.uuid('event 2'));
-        await subject.add(Event.uuid('event 3'));
+        await subject.add(Event.create('event 1'));
+        await subject.add(Event.create('event 2'));
+        await subject.add(Event.create('event 3'));
         expect(subject.length, equals(3));
 
         final List<Event> firstTwoEvents = await subject.fetch(2);
@@ -156,8 +156,8 @@ void main() {
       });
 
       test('works with numbers greater than the event count', () async {
-        await subject.add(Event.uuid('event 1'));
-        await subject.add(Event.uuid('event 2'));
+        await subject.add(Event.create('event 1'));
+        await subject.add(Event.create('event 2'));
         expect(subject.length, equals(2));
 
         final List<Event> poppedEvents = await subject.fetch(100);
@@ -176,9 +176,9 @@ void main() {
         subject = EventBuffer(provider, Config());
 
         final events = [
-          Event.uuid('flush 1', id: 1),
-          Event.uuid('flush 2', id: 2),
-          Event.uuid('flush 3', id: 3)
+          Event.create('flush 1', id: 1),
+          Event.create('flush 2', id: 2),
+          Event.create('flush 3', id: 3)
         ];
 
         when(() => mockStore.length).thenReturn(events.length);
@@ -227,7 +227,7 @@ void main() {
         when(() => mockStore.delete(any())).thenAnswer((_) => Future.value());
         when(() => mockClient.post(any())).thenAnswer((_) => Future.value(413));
         subject.numEvents = 1;
-        final event = Event.uuid('massive event', id: 99);
+        final event = Event.create('massive event', id: 99);
         when(() => mockStore.fetch(any()))
             .thenAnswer((_) => Future.value([event]));
 

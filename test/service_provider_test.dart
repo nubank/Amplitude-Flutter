@@ -1,119 +1,145 @@
 import 'package:amplitude_flutter/src/service_provider.dart';
+import 'package:amplitude_flutter/src/store.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'mock_store.dart';
 
 void main() {
-  group('ServiceProvider enableUuid', () {
+  group('ServiceProvider', () {
     setUpAll(() {
       TestWidgetsFlutterBinding.ensureInitialized();
     });
 
-    group('enableUuid propagation to Store', () {
-      test('creates Store with enableUuid=true when specified', () {
-        // Create a custom store to avoid singleton conflicts
-        final customStore = MockStore();
-        customStore.enableUuid = true;
-
+    group('initialization', () {
+      test('initializes all components correctly', () {
         final provider = ServiceProvider(
           apiKey: 'test-api-key',
           timeout: 30000,
           getCarrierInfo: false,
-          enableUuid: true,
-          store: customStore,
         );
 
+        expect(provider.client, isNotNull);
+        expect(provider.deviceInfo, isNotNull);
+        expect(provider.session, isNotNull);
         expect(provider.store, isNotNull);
-        expect(provider.store!.enableUuid, isTrue);
       });
 
-      test('creates Store with enableUuid=false when specified', () {
-        // Create a custom store to avoid singleton conflicts
-        final customStore = MockStore();
-        customStore.enableUuid = false;
-
-        final provider = ServiceProvider(
-          apiKey: 'test-api-key-false',
-          timeout: 30000,
-          getCarrierInfo: false,
-          enableUuid: false,
-          store: customStore,
-        );
-
-        expect(provider.store, isNotNull);
-        expect(provider.store!.enableUuid, isFalse);
-      });
-
-      test('uses provided Store instance when given', () {
-        final mockStore = MockStore();
-        mockStore.enableUuid = false;
-
-        final provider = ServiceProvider(
-          apiKey: 'test-api-key',
-          timeout: 30000,
-          getCarrierInfo: false,
-          enableUuid: true, // This should be ignored when store is provided
-          store: mockStore,
-        );
-
-        expect(provider.store, equals(mockStore));
-        expect(provider.store!.enableUuid,
-            isFalse); // Uses the provided store's setting
-      });
-    });
-
-    group('ServiceProvider initialization', () {
-      test('initializes all components correctly with enableUuid=true', () {
-        final customStore = MockStore();
-        customStore.enableUuid = true;
-
+      test('initializes with carrier info enabled', () {
         final provider = ServiceProvider(
           apiKey: 'test-api-key',
           timeout: 30000,
           getCarrierInfo: true,
-          enableUuid: true,
-          store: customStore,
         );
 
         expect(provider.client, isNotNull);
         expect(provider.deviceInfo, isNotNull);
         expect(provider.session, isNotNull);
         expect(provider.store, isNotNull);
-        expect(provider.store!.enableUuid, isTrue);
       });
 
-      test('initializes all components correctly with enableUuid=false', () {
-        final customStore = MockStore();
-        customStore.enableUuid = false;
+      test('uses provided Store instance when given', () {
+        final mockStore = MockStore();
 
         final provider = ServiceProvider(
           apiKey: 'test-api-key',
           timeout: 30000,
           getCarrierInfo: false,
-          enableUuid: false,
-          store: customStore,
+          store: mockStore,
         );
 
+        expect(provider.store, equals(mockStore));
         expect(provider.client, isNotNull);
         expect(provider.deviceInfo, isNotNull);
         expect(provider.session, isNotNull);
+      });
+
+      test('creates default Store when none provided', () {
+        final provider = ServiceProvider(
+          apiKey: 'test-api-key',
+          timeout: 30000,
+          getCarrierInfo: false,
+        );
+
         expect(provider.store, isNotNull);
-        expect(provider.store!.enableUuid, isFalse);
+        expect(provider.store, isA<Store>());
       });
     });
 
-    group('Store instance management', () {
-      test('creates new Store when none provided', () {
+    group('component configuration', () {
+      test('configures client with correct API key', () {
+        final provider = ServiceProvider(
+          apiKey: 'test-api-key-123',
+          timeout: 30000,
+          getCarrierInfo: false,
+        );
+
+        expect(provider.client, isNotNull);
+        // Note: We can't directly test the API key since it's private in Client
+        // but we can verify the client was created
+      });
+
+      test('configures session with correct timeout', () {
+        final provider = ServiceProvider(
+          apiKey: 'test-api-key',
+          timeout: 60000,
+          getCarrierInfo: false,
+        );
+
+        expect(provider.session, isNotNull);
+        // Note: We can't directly test the timeout since it's private in Session
+        // but we can verify the session was created
+      });
+
+      test('configures device info with carrier info setting', () {
+        final providerWithCarrier = ServiceProvider(
+          apiKey: 'test-api-key',
+          timeout: 30000,
+          getCarrierInfo: true,
+        );
+
+        final providerWithoutCarrier = ServiceProvider(
+          apiKey: 'test-api-key-2',
+          timeout: 30000,
+          getCarrierInfo: false,
+        );
+
+        expect(providerWithCarrier.deviceInfo, isNotNull);
+        expect(providerWithoutCarrier.deviceInfo, isNotNull);
+        // Note: We can't directly test the getCarrierInfo setting since it's private
+        // but we can verify both device info instances were created
+      });
+    });
+
+    group('multiple instances', () {
+      test('creates independent instances', () {
+        final provider1 = ServiceProvider(
+          apiKey: 'test-api-key-1',
+          timeout: 30000,
+          getCarrierInfo: false,
+        );
+
+        final provider2 = ServiceProvider(
+          apiKey: 'test-api-key-2',
+          timeout: 60000,
+          getCarrierInfo: true,
+        );
+
+        // Client and Session are singletons, so instances will be the same
+        expect(provider1.client, equals(provider2.client));
+        expect(provider1.session, equals(provider2.session));
+        // DeviceInfo should be different instances
+        expect(provider1.deviceInfo, isNot(equals(provider2.deviceInfo)));
+        // Store instances might be the same due to singleton pattern with default dbFile
+      });
+
+      test('respects different store instances', () {
         final store1 = MockStore();
-        store1.enableUuid = true;
         final store2 = MockStore();
-        store2.enableUuid = false;
 
         final provider1 = ServiceProvider(
           apiKey: 'test-api-key-1',
           timeout: 30000,
           getCarrierInfo: false,
-          enableUuid: true,
           store: store1,
         );
 
@@ -121,67 +147,12 @@ void main() {
           apiKey: 'test-api-key-2',
           timeout: 30000,
           getCarrierInfo: false,
-          enableUuid: false,
           store: store2,
         );
 
-        expect(provider1.store, isNotNull);
-        expect(provider2.store, isNotNull);
-        expect(provider1.store!.enableUuid, isTrue);
-        expect(provider2.store!.enableUuid, isFalse);
-      });
-
-      test('respects provided Store instance', () {
-        final customStore = MockStore();
-        customStore.enableUuid = true;
-
-        final provider = ServiceProvider(
-          apiKey: 'test-api-key',
-          timeout: 30000,
-          getCarrierInfo: false,
-          enableUuid: false, // This should be ignored
-          store: customStore,
-        );
-
-        expect(provider.store, equals(customStore));
-        expect(provider.store!.enableUuid, isTrue);
-      });
-    });
-
-    group('component interaction', () {
-      test('all components are initialized regardless of enableUuid setting',
-          () {
-        final storeWithUuid = MockStore();
-        storeWithUuid.enableUuid = true;
-        final storeWithoutUuid = MockStore();
-        storeWithoutUuid.enableUuid = false;
-
-        final providerWithUuid = ServiceProvider(
-          apiKey: 'test-api-key-with-uuid',
-          timeout: 30000,
-          getCarrierInfo: false,
-          enableUuid: true,
-          store: storeWithUuid,
-        );
-
-        final providerWithoutUuid = ServiceProvider(
-          apiKey: 'test-api-key-without-uuid',
-          timeout: 30000,
-          getCarrierInfo: false,
-          enableUuid: false,
-          store: storeWithoutUuid,
-        );
-
-        // Both should have all components initialized
-        expect(providerWithUuid.client, isNotNull);
-        expect(providerWithUuid.deviceInfo, isNotNull);
-        expect(providerWithUuid.session, isNotNull);
-        expect(providerWithUuid.store, isNotNull);
-
-        expect(providerWithoutUuid.client, isNotNull);
-        expect(providerWithoutUuid.deviceInfo, isNotNull);
-        expect(providerWithoutUuid.session, isNotNull);
-        expect(providerWithoutUuid.store, isNotNull);
+        expect(provider1.store, equals(store1));
+        expect(provider2.store, equals(store2));
+        expect(provider1.store, isNot(equals(provider2.store)));
       });
     });
   });

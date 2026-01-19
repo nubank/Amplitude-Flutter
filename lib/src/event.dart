@@ -33,7 +33,6 @@ class Event {
   int? timestamp;
   String? name;
   Map<String, dynamic> props = <String, dynamic>{};
-  String? uuid;
 
   void addProps(Map<String, dynamic>? props) {
     if (props != null) {
@@ -51,7 +50,6 @@ class Event {
       'event_type': name,
       'session_id': sessionId,
       'timestamp': timestamp,
-      'uuid': uuid,
       'library': {
         'name': Constants.packageName,
         'version': Constants.packageVersion,
