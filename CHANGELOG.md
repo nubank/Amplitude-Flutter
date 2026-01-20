@@ -1,3 +1,6 @@
+## 1.4.7
+* Update libs
+
 ## 1.4.6
 * Accept preset timestamp
 * Remove UUID
