@@ -1,6 +1,6 @@
 class Constants {
   static const packageName = 'amplitude-flutter';
-  static const packageVersion = '1.4.6';
+  static const packageVersion = '1.4.7';
 
   // Local storage
   static const kLocalStoreDeviceIdKey = 'amp:device_id';
